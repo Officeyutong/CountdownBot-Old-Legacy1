@@ -105,7 +105,7 @@ def get_reply(context):
         user_data['count'] = 1
         
     # 签到
-    delta = 40-datetime.now().hour
+    delta = 40-(24+datetime.now().hour-6)%24
     add = 5*(user_data['count']-1)
     if add > 50:
         add = 50
