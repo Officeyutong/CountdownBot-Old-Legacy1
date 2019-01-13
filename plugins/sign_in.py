@@ -91,8 +91,8 @@ def get_reply(context):
     
     # 比较上次签到时间，今日已经签到
     if last_day == today:
-        return "%s今天已经签过到了！\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
-            nickname, user_data['rating'], user_data['times_month'], user_data['times_all'])
+        return "%s今天已经签过到了！\n当前积分：%d\n连续签到天数：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
+            nickname, user_data['rating'], user_data['count'], user_data['times_month'], user_data['times_all'])
 
     # 清零上个月
     if last_day.month != today.month or last_day.year != today.year:
@@ -105,7 +105,7 @@ def get_reply(context):
         user_data['count'] = 1
         
     # 签到
-    delta = 40-(24+datetime.now().hour-6)%24
+    delta = random.randint(30,40)
     add = 5*(user_data['count']-1)
     if add > 50:
         add = 50
@@ -115,8 +115,8 @@ def get_reply(context):
     user_data['date'] = str(date.today())
     data[user_id] = user_data
     save_data(data, group_id)
-    return "给%s签到成功了！\n积分增加：%d\n连续签到天数：%d\n连续签到积分加成：%d\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
-        nickname, delta+add, user_data['count'], add, user_data['rating'], user_data['times_month'], user_data['times_all'])
+    return "给%s签到成功了！\n积分增加：%d (连续签到加成：%d)\n当前积分：%d\n连续签到天数：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
+        nickname, delta+add, add, user_data['rating'], user_data['count'], user_data['times_month'], user_data['times_all'])
 
 
 @web_app.route("/api/credit/get_by_group/<int:group_id>", methods=["POST", "GET"])
