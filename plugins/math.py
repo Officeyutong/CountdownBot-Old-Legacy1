@@ -72,5 +72,6 @@ def renderLatex(formula: str)->BytesIO:
     from sympy import preview
     print_log("Rendering {}".format(formula))
     buffer = BytesIO()
-    preview(formula, viewer="BytesIO", euler=False, outputbuffer=buffer)
+    preview(formula, viewer="BytesIO", euler=False,
+            outputbuffer=buffer, packages=("amssymb","color","amsthm","multirow","enumerate","amstext","extarrows"))
     return buffer
