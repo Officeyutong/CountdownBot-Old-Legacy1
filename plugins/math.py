@@ -9,7 +9,9 @@ import threading
 import time
 import base64
 from io import BytesIO
+import global_vars
 config = global_vars.CONFIG[__name__]
+
 
 def plugin():
     return {
