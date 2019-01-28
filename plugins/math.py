@@ -75,5 +75,5 @@ def renderLatex(formula: str)->BytesIO:
     print_log("Rendering {}".format(formula))
     buffer = BytesIO()
     preview(formula, viewer="BytesIO", euler=False,
-            outputbuffer=buffer, packages=config.LATEX_PACKAGES)
+            outputbuffer=buffer, packages=tuple(config.LATEX_PACKAGES))
     return buffer
