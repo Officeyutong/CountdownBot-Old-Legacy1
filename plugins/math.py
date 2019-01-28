@@ -9,7 +9,7 @@ import threading
 import time
 import base64
 from io import BytesIO
-
+config = global_vars.CONFIG[__name__]
 
 def plugin():
     return {
@@ -73,5 +73,5 @@ def renderLatex(formula: str)->BytesIO:
     print_log("Rendering {}".format(formula))
     buffer = BytesIO()
     preview(formula, viewer="BytesIO", euler=False,
-            outputbuffer=buffer, packages=("amssymb", "color", "amsthm", "multirow", "enumerate", "amstext", "extraarrows"))
+            outputbuffer=buffer, packages=config.LATEX_PACKAGES)
     return buffer
