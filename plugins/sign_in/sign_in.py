@@ -9,8 +9,9 @@ import random
 from datetime import datetime, date
 from json import JSONDecoder, JSONEncoder
 web_app = global_vars.VARS["web_app"]
-DATA_PATH = "plugins/data/sign_in"
-config=global_vars.CONFIG[__name__]
+DATA_PATH = os.path.join(os.path.dirname(__file__))
+config = global_vars.CONFIG[__name__]
+
 
 def plugin():
     return {
@@ -21,7 +22,7 @@ def plugin():
 
 
 def load():
-    # web_app = 
+    # web_app =
     pass
 
 

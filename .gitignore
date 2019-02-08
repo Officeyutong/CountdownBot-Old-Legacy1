@@ -3,6 +3,7 @@ group-*.json
 *_config.py
 plugins/data/*
 cats.json
+config.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
