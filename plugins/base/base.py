@@ -30,8 +30,8 @@ def show_status(bot: CQHttp, context, args):
 Hitokoto广播时间: {hitokoto_hour:0>2d}:{hitokoto_minute:0>2d}
 指令前缀: {command_prefix}
 输入 [指令前缀]help 查看帮助""".format(
-            broadcast_hour=CONFIG["plugins.broadcast"].BROADCAST_HOUR, broadcast_minute=CONFIG["plugins.broadcast"].BROADCAST_MINUTE,
-            hitokoto_hour=CONFIG["plugins.hitokoto"].HITOKOTO_HOUR, hitokoto_minute=CONFIG["plugins.hitokoto"].HITOKOTO_MINUTE,
+            broadcast_hour=CONFIG["plugins.broadcast.broadcast"].BROADCAST_HOUR, broadcast_minute=CONFIG["plugins.broadcast.broadcast"].BROADCAST_MINUTE,
+            hitokoto_hour=CONFIG["plugins.hitokoto.hitokoto"].HITOKOTO_HOUR, hitokoto_minute=CONFIG["plugins.hitokoto.hitokoto"].HITOKOTO_MINUTE,
             command_prefix="".join(
                 map(lambda x: x+" ", global_config.COMMAND_PREFIX)),
         )
