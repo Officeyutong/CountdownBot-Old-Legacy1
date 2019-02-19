@@ -53,6 +53,7 @@ def plugin():
 
 def load():
     global games, commands
+    print("Loading...")
     VARS["zxh_games"] = {}
     VARS["commands"] = set()
     commands = VARS["commands"]
