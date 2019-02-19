@@ -52,7 +52,7 @@ def plugin():
 
 
 def load():
-    global  games, commands
+    global games, commands
     VARS["zxh_games"] = {}
     VARS["commands"] = set()
     commands = VARS["commands"]
@@ -60,11 +60,25 @@ def load():
     for name in dir(sys.modules[__name__]):
         if name.startswith("zxh_command_"):
             commands.add(name[name.rindex("_")+1:])
+
+
 def encode_json(obj):
     return json.JSONEncoder().encode(obj)
+
+
 @app.route("/zxh/get_data")
 def web_get_data():
     return encode_json(load_data())
+
+
+@app.route("/zxh/set_data", methods=["POST"])
+def web_set_data():
+    dat = flask.request.form
+    if dat.get("password", None) != config.ADMIN_PASSWORD:
+        return encode_json({
+            "code": -1, "message": "密码错误"
+        })
+    
 
 class Game:
     # 群号
@@ -98,7 +112,8 @@ class Game:
     # 剩余x轮后要执行的函数
     countdowns: list = None
     # 下一局要受惩罚的玩家集合
-    next_punish:set=None
+    next_punish: set = None
+
     def __init__(self, bot, group):
         self.group = group
         self.players = set()
@@ -112,7 +127,7 @@ class Game:
         self.limits = dict()
         self.player_items = dict()
         self.countdowns = []
-        self.next_punish=set()
+        self.next_punish = set()
         # self.punishes = set()
         # self.send_message("群 {} 的游戏创建成功qwq".format(self.group))
 
@@ -237,13 +252,13 @@ class Game:
         msg += "点数最小: {} {}\n点数最大: {} {}\n".format(self.get_profile(
             minval[0]), minval[1], self.get_profile(maxval[0]), maxval[1])
         self.punish_list = self.adjoint_punish.copy()
-            
+
         if minval[0] in self.adjoint_punish:
             self.adjoint_punish.remove(minval[0])
             self.send_message("{} 已成为最小点数，下局起不再连带受罚。".format(
                 self.get_profile(minval[0])))
         if not self.next_punish:
-            self.punish_list+=self.next_punish
+            self.punish_list += self.next_punish
             self.next_punish.clear()
         else:
             if self.max_punish:
@@ -333,7 +348,7 @@ class Game:
             self.countdowns.append(
                 [punish["rounds"]+1, lambda: self.limits.pop(player_id, None)])
         elif punish["type"] == "next_punish":
-            self.next_punish=self.punish_list.copy()
+            self.next_punish = self.punish_list.copy()
     # def _handle_
 
     def _give_item(self, player_id: int, item_id: str):
