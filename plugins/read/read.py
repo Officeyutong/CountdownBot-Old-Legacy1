@@ -36,10 +36,8 @@ def read(bot, context, args):
         })
         
         if not isinstance(voice, dict):
-            result = ""
-            with open(audiopath, "rb") as file:
-                result = base64.encodebytes(file.read()).decode().replace("\n", "")
-                bot.send(context, "[CQ:record,file=base64://{}]".format(result))
+            result = str(base64.encodebytes(voice).decode().replace("\n", ""))
+            bot.send(context, "[CQ:record,file=base64://{}]".format(result))
         else:
             bot.send(context, "转换语音失败，请检查是否含有非法字符")
     
