@@ -4,8 +4,9 @@ import base64
 import tempfile
 import os
 from aip import AipSpeech
-
+import threading
 config = CONFIG[__name__]
+
 
 def plugin():
     return {
@@ -16,7 +17,7 @@ def plugin():
 
 
 @command(name="read", help="文字转语音")
-def sam(bot, context, args):
+def read(bot, context, args):
 
     if len(args) < 2:
         bot.send(context, "请输入文字")
@@ -26,25 +27,26 @@ def sam(bot, context, args):
         bot.send(context, "字符串过长")
         return
 
-    client = AipSpeech(config.APP_ID, config.API_KEY, config.SECRET_KEY)
+    def handle():
+        client = AipSpeech(config.APP_ID, config.API_KEY, config.SECRET_KEY)
+        voice = client.synthesis(string, 'zh', 1, {
+            'vol': 10,
+            'per': 4,
+            'spd': 4
+        })
 
-    voice = client.synthesis(string, 'zh', 1, {
-    'vol': 10,
-    'per': 4,
-    'spd': 4
-    })
+        tmpdir = tempfile.mkdtemp()
+        audiopath = os.path.join(tmpdir, "audio.mp3")
 
-    tmpdir = tempfile.mkdtemp()
-    audiopath=os.path.join(tmpdir, "audio.mp3")
+        if not isinstance(voice, dict):
+            with open(audiopath, "wb") as file:
+                file.write(voice)
+        else:
+            bot.send(context, "转换语音失败，请检查是否含有非法字符")
+            return
 
-    if not isinstance(voice, dict):
-        with open(audiopath, "wb") as file:
-            file.write(voice)
-    else:
-        bot.send(context, "转换语音失败，请检查是否含有非法字符")
-        return
-
-    result = ""
-    with open(audiopath, "rb") as file:
-        result = base64.encodebytes(file.read()).decode().replace("\n", "")
-        bot.send(context, "[CQ:record,file=base64://{}]".format(result))
+        result = ""
+        with open(audiopath, "rb") as file:
+            result = base64.encodebytes(file.read()).decode().replace("\n", "")
+            bot.send(context, "[CQ:record,file=base64://{}]".format(result))
+    threading.Thread(target=handle).start()

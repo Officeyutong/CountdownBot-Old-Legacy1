@@ -43,12 +43,12 @@ HELP_STR =\
 DATA_PATH = os.path.join(os.path.dirname(__file__))
 
 
-# def plugin():
-#     return {
-#         "author": "officeyutong",
-#         "version": 1.0,
-#         "description": "真心话大冒险支持"
-#     }
+def plugin():
+    return {
+        "author": "officeyutong",
+        "version": 1.0,
+        "description": "真心话大冒险支持"
+    }
 
 
 def load():
