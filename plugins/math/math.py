@@ -9,6 +9,8 @@ import threading
 import time
 import base64
 from io import BytesIO
+import global_vars
+config = global_vars.CONFIG[__name__]
 
 
 def plugin():
@@ -72,5 +74,6 @@ def renderLatex(formula: str)->BytesIO:
     from sympy import preview
     print_log("Rendering {}".format(formula))
     buffer = BytesIO()
-    preview(formula, viewer="BytesIO", euler=False, outputbuffer=buffer)
+    preview(formula, viewer="BytesIO", euler=False,
+            outputbuffer=buffer, packages=tuple(config.LATEX_PACKAGES))
     return buffer

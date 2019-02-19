@@ -62,7 +62,7 @@ def suck_cats(bot: CQHttp, context, args):
         choices = []
         for k, v in data.items():
             choices += [k]*len(v["image_list"])
-        selected_user = random.choice(choices)  
+        selected_user = random.choice(choices)
     print_log("user:{}".format(selected_user))
     if selected_user not in data:
         bot.send(context, "指定用户未上传过猫片")
@@ -143,7 +143,7 @@ def load_data()->dict:
     print_log(__file__)
     import os
     print_log(os.sys.path)
-    config_path = os.path.join(os.sys.path[0], "plugins/data/cats.json")
+    config_path = os.path.join(os.path.dirname(__file__),"cats.json")
     if not os.path.exists(config_path):
         with open(config_path, "w") as file:
             file.write("{}")
@@ -154,5 +154,6 @@ def load_data()->dict:
 
 
 def save_data(obj: dict):
-    with open("plugins/data/cats.json", "w") as file:
+    import os
+    with open(os.path.join(os.path.dirname(__file__),"cats.json"), "w") as file:
         json.dump(obj, file)

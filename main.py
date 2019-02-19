@@ -27,37 +27,32 @@ def start():
     global_vars.VARS["web_app"] = bot._server_app
     global_vars.CONFIG[__name__] = config
 
-    def load_python_plugin(plugin):
-        plugin_name = plugin[:plugin.index(".py")]
-        if os.path.exists("./plugins/config/%s_config.py" % plugin_name):
-            global_vars.CONFIG["plugins."+plugin_name] = importlib.import_module(
-                "plugins.config."+plugin_name+"_config")
-        elif os.path.exists("./plugins/config/%s_config_default.py" % plugin_name):
-            global_vars.CONFIG["plugins."+plugin_name] = importlib.import_module(
-                "plugins.config."+plugin_name+"_config_default")
-        this = importlib.import_module("plugins."+plugin_name)
+    def load_plugin(plugin):
+        # plugin_name = plugin[:plugin.index(".py")]
+        plugin_dir = os.path.join("./plugins/%s" % plugin)
+        if os.path.exists(os.path.join(plugin_dir, "config.py")):
+            global_vars.CONFIG["plugins.%s.%s" % (plugin, plugin)] = importlib.import_module(
+                "plugins.%s.config" % plugin)
+        elif os.path.exists(os.path.join(plugin_dir, "config_default.py")):
+            global_vars.CONFIG["plugins.%s.%s" % (plugin, plugin)] = importlib.import_module(
+                "plugins.%s.config_default" % plugin)
+        this = importlib.import_module("plugins.%s.%s"%(plugin,plugin))
         if "plugin" in dir(this):
-            loaded_plugins[plugin_name] = (dict(**this.plugin(), **{
+            loaded_plugins[plugin] = (dict(**this.plugin(), **{
                 "load": getattr(this, "load", None),
                 "disable": getattr(this, "disable", None),
-                "name": plugin_name
+                "name": plugin
             }))
             if hasattr(this, "load"):
                 this.load()
-            print_log("Loaded plugin: {}".format(loaded_plugins[plugin_name]))
-
-    def load_javascript_plugin(name):
-        pass
+            print_log("Loaded plugin: {}".format(loaded_plugins[plugin]))
     # 加载插件
     for plugin in os.listdir("./plugins"):
-        if os.path.isfile(os.path.join("./plugins", plugin)) == False:
+        if os.path.isdir(os.path.join("./plugins", plugin)) == False:
             continue
         if plugin.startswith("__"):
             continue
-        if plugin.endswith(".py"):
-            load_python_plugin(plugin)
-        elif plugin.endswith(".js"):
-            load_javascript_plugin(plugin)
+        load_plugin(plugin)
     print_log("Registered commands:\n{}".format("".join(
         map(lambda x: "{} :{}\n".format(x[0], x[1]), registered_commands.items()))))
     print_log("Registered message listeners:\n{}".format(message_listeners))
@@ -142,7 +137,7 @@ def input_loop():
                 console_commands[args[0]][1](args)
             except Exception as ex:
                 print_log(ex)
-                raise ex
+                # raise ex
         else:
             print("Unknown command: {}".format(args))
 
