@@ -43,12 +43,12 @@ HELP_STR =\
 DATA_PATH = os.path.join(os.path.dirname(__file__))
 
 
-# def plugin():
-#     return {
-#         "author": "officeyutong",
-#         "version": 1.0,
-#         "description": "真心话大冒险支持"
-#     }
+def plugin():
+    return {
+        "author": "officeyutong",
+        "version": 1.0,
+        "description": "真心话大冒险支持"
+    }
 
 
 def load():
@@ -418,7 +418,7 @@ class Game:
         # self.send_message(self.get_status_punish())
 
 
-@command(name="zxh", help="加入/退出真心话大冒险")
+# @command(name="zxh", help="加入/退出真心话大冒险")
 def zxh(bot: CQHttp, context, args):
     if context["group_id"] not in config.ENABLE_GROUPS:
         bot.send(context, "本群未启用本功能！")
@@ -437,7 +437,7 @@ def zxh(bot: CQHttp, context, args):
     # print(context)
 
 
-@message_listener
+# @message_listener
 def zxh_command(bot: CQHttp, context, message):
     player = context["sender"]["user_id"]
     group = context["group_id"]
