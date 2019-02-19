@@ -30,9 +30,9 @@ def read(bot, context, args):
     def handle():
         client = AipSpeech(config.APP_ID, config.API_KEY, config.SECRET_KEY)
         voice = client.synthesis(string, 'zh', 1, {
-            'vol': 10,
+            'vol': config.VOLUME,
             'per': 4,
-            'spd': 4
+            'spd': config.SPEED
         })
 
         tmpdir = tempfile.mkdtemp()
