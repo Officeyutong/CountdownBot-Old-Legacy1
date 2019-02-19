@@ -15,7 +15,7 @@ config = global_vars.CONFIG[__name__]
 
 def plugin():
     return {
-        "author": "ACCEPT",
+        "author": "Antares",
         "version": 1.0,
         "description": "签到支持"
     }

@@ -1,0 +1,6 @@
+MAX_STRING_LENGTH = 300
+
+# Baidu AI Apps
+APP_ID = ""
+API_KEY = ""
+SECRET_KEY = ""
