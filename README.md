@@ -14,7 +14,6 @@ QQ群倒计时bot.
 - cqhttp (使用pip安装)
 - docker (Python的docker客户端，用pip安装)
 - texlive pyglet dvipng (如果需要渲染Latex)
-- 
 
 #### 使用说明
 

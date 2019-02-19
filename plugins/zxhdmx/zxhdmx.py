@@ -79,6 +79,10 @@ def web_set_data():
         return encode_json({
             "code": -1, "message": "密码错误"
         })
+    save_data(dat["data"])
+    return encode_json({
+        "code":0,"message":"操作成功"
+    })
     
 
 class Game:
