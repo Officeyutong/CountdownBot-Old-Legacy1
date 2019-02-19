@@ -34,19 +34,13 @@ def read(bot, context, args):
             'per': 4,
             'spd': config.SPEED
         })
-
-        tmpdir = tempfile.mkdtemp()
-        audiopath = os.path.join(tmpdir, "audio.mp3")
-
+        
         if not isinstance(voice, dict):
-            with open(audiopath, "wb") as file:
-                file.write(voice)
+            result = ""
+            with open(audiopath, "rb") as file:
+                result = base64.encodebytes(file.read()).decode().replace("\n", "")
+                bot.send(context, "[CQ:record,file=base64://{}]".format(result))
         else:
             bot.send(context, "转换语音失败，请检查是否含有非法字符")
-            return
-
-        result = ""
-        with open(audiopath, "rb") as file:
-            result = base64.encodebytes(file.read()).decode().replace("\n", "")
-            bot.send(context, "[CQ:record,file=base64://{}]".format(result))
+    
     threading.Thread(target=handle).start()
