@@ -6,7 +6,7 @@ import os
 import re
 import json
 import random
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from json import JSONDecoder, JSONEncoder
 web_app = global_vars.VARS["web_app"]
 DATA_PATH = os.path.join(os.path.dirname(__file__))
@@ -70,8 +70,7 @@ def get_user_data(data: dict, user_id):
         "rating": 0,
         "times_all": 0,
         "times_month": 0,
-        "date": "0001-01-01",
-        "count": 0
+        "date": "0001-01-01"
     })
 
 
@@ -89,35 +88,26 @@ def get_reply(context):
 
     today = datetime.strptime(str(date.today()), '%Y-%m-%d')
     last_day = datetime.strptime(user_data['date'], '%Y-%m-%d')
-    
+
     # 比较上次签到时间，今日已经签到
-    if last_day == today:
-        return "%s今天已经签过到了！\n当前积分：%d\n连续签到天数：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
-            nickname, user_data['rating'], user_data['count'], user_data['times_month'], user_data['times_all'])
+    if last_day >= today:
+        return "%s今天已经签过到了！\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
+            nickname, user_data['rating'], user_data['times_month'], user_data['times_all'])
 
     # 清零上个月
     if last_day.month != today.month or last_day.year != today.year:
         user_data['times_month'] = 0
 
-    # 连续签到计数
-    if today - last_day == timedelta(days=1):
-        user_data['count'] += 1
-    else:
-        user_data['count'] = 1
-        
     # 签到
-    delta = random.randint(30,40)
-    add = 5*(user_data['count']-1)
-    if add > 50:
-        add = 50
-    user_data['rating'] += (delta+add)
+    delta = random.randint(10, 50-datetime.now().hour)
+    user_data['rating'] += delta
     user_data['times_month'] += 1
     user_data['times_all'] += 1
     user_data['date'] = str(date.today())
     data[user_id] = user_data
     save_data(data, group_id)
-    return "给%s签到成功了！\n积分增加：%d (连续签到加成：%d)\n当前积分：%d\n连续签到天数：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
-        nickname, delta+add, add, user_data['rating'], user_data['count'], user_data['times_month'], user_data['times_all'])
+    return "给%s签到成功了！\n积分增加：%d\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
+        nickname, delta, user_data['rating'], user_data['times_month'], user_data['times_all'])
 
 
 @web_app.route("/api/credit/get_by_group/<int:group_id>", methods=["POST", "GET"])
