@@ -389,7 +389,7 @@ class Game:
         self.points.clear()
         self.punish_list.clear()
         self.selector = -1
-        # 倒计时函数
+        # 倒计时函数    
         for item in self.countdowns:
             item[0] -= 1
             if item[0] == 0:
