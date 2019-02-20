@@ -283,7 +283,8 @@ class Game:
             self.send_message("{} 已成为最小点数，下局起不再连带受罚。".format(
                 self.get_profile(minval[0])))
         if not self.next_punish:
-            self.punish_list += self.next_punish
+            # self.punish_list += self.next_punish
+            self.punish_list = self.punish_list.union(self.next_punish)
             self.next_punish.clear()
         else:
             if self.max_punish:
@@ -389,7 +390,7 @@ class Game:
         self.points.clear()
         self.punish_list.clear()
         self.selector = -1
-        # 倒计时函数    
+        # 倒计时函数
         for item in self.countdowns:
             item[0] -= 1
             if item[0] == 0:
