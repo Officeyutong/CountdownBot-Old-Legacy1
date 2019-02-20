@@ -28,7 +28,7 @@ STAGES = {
     GameStage.SELECT_PUNISH: "选择惩罚中",
     GameStage.PUNISH: "惩罚进行中"
 }
-
+WEB_DIR = os.path.join(os.path.dirname(__file__), "web/")
 HELP_STR =\
     """开始 ---- 开始本群游戏
 拼点 ---- 参与拼点
@@ -67,23 +67,43 @@ def encode_json(obj):
     return json.JSONEncoder().encode(obj)
 
 
-@app.route("/zxh/get_data")
+@app.route("/zxh/get_data", methods=["POST"])
 def web_get_data():
-    return encode_json(load_data())
+    dat = flask.request.form
+    if dat.get("password", None).lower() != get_md5(get_md5(config.ADMIN_PASSWORD)+"qwqqwqqwq"):
+        return encode_json({
+            "code": -1, "message": "密码错误"
+        })
+    return encode_json({
+        "code": 0, "data": load_data()
+    })
 
 
 @app.route("/zxh/set_data", methods=["POST"])
 def web_set_data():
     dat = flask.request.form
-    if dat.get("password", None) != config.ADMIN_PASSWORD:
+    if dat.get("password", None).lower() != get_md5(get_md5(config.ADMIN_PASSWORD)+"qwqqwqqwq"):
         return encode_json({
             "code": -1, "message": "密码错误"
         })
-    save_data(dat["data"])
+    save_data(json.JSONDecoder().decode(dat["data"]))
     return encode_json({
-        "code":0,"message":"操作成功"
+        "code": 0, "message": "操作成功"
     })
-    
+    # flask.make_response()
+
+
+@app.route("/zxh/edit", methods=["GET"])
+def web_edit_page():
+    return flask.send_from_directory(WEB_DIR, "edit.html")
+
+
+def get_md5(text: str)->str:
+    import hashlib
+    ins = hashlib.md5()
+    ins.update(text.encode("utf-8"))
+    return ins.hexdigest()
+
 
 class Game:
     # 群号

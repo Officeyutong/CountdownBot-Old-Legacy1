@@ -36,7 +36,7 @@ def start():
         elif os.path.exists(os.path.join(plugin_dir, "config_default.py")):
             global_vars.CONFIG["plugins.%s.%s" % (plugin, plugin)] = importlib.import_module(
                 "plugins.%s.config_default" % plugin)
-        this = importlib.import_module("plugins.%s.%s"%(plugin,plugin))
+        this = importlib.import_module("plugins.%s.%s" % (plugin, plugin))
         if "plugin" in dir(this):
             loaded_plugins[plugin] = (dict(**this.plugin(), **{
                 "load": getattr(this, "load", None),
@@ -64,6 +64,8 @@ def start():
     app_thread = threading.Thread(target=lambda: bot.run(
         host=config.POST_ADDRESS, port=config.POST_PORT))
     app_thread.start()
+    # bot.run(
+    #     host=config.POST_ADDRESS, port=config.POST_PORT, debug=True)
     global_vars.VARS["app_thread"] = app_thread
     input_loop()
 

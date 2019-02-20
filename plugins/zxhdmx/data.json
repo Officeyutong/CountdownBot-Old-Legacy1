@@ -1,28 +1,36 @@
 {
     "problem_set": {
         "1": {
-            "name": "真心话",
+            "name": "\u771f\u5fc3\u8bdd",
             "rules": [
                 {
                     "type": "simple",
-                    "content": "<问题1>"
+                    "content": "<\u95ee\u98981>"
                 },
                 {
                     "type": "simple",
-                    "content": "<问题2>"
+                    "content": "<\u95ee\u98982>"
                 },
                 {
                     "type": "simple",
-                    "content": "<问题3>"
+                    "content": "<\u95ee\u98983>"
+                },
+                {
+                    "type": "simple",
+                    "content": "qwq"
+                },
+                {
+                    "type": "simple",
+                    "content": "qwq"
                 }
             ]
         },
         "2": {
-            "name": "大冒险",
+            "name": "\u5927\u5192\u9669",
             "rules": [
                 {
                     "type": "simple",
-                    "content": "女装三天"
+                    "content": "\u5973\u88c5\u4e09\u5929qwqqwq"
                 },
                 {
                     "type": "punish",
@@ -45,28 +53,34 @@
     },
     "items": {
         "transfer_punish": {
-            "name": "将当前所受惩罚转移给另一名玩家"
+            "name": "\u5c06\u5f53\u524d\u6240\u53d7\u60e9\u7f5a\u8f6c\u79fb\u7ed9 \u53e6\u4e00\u540d\u73a9\u5bb6"
         }
     },
     "punish": {
+        "4": {
+            "type": "problem_set_limit",
+            "name": "\u5624\u5624\u5624qwq",
+            "rounds": "5",
+            "val": "2"
+        },
         "max_punish": {
             "type": "max_punish",
             "rounds": 2,
-            "name": "接下来2局内，点数最大者受罚，由点数最小者选择"
+            "name": "\u63a5\u4e0b\u67652\u5c40\u5185\uff0c\u70b9\u6570\u6700\u5927\u8005\u53d7\u7f5a\uff0c\u7531\u70b9\u6570\u6700\u5c0f \u8005\u9009\u62e9"
         },
         "punish_until_min": {
             "type": "punish_until_min",
-            "name": "当前玩家一直受罚直到成为点数最小"
+            "name": "\u5f53\u524d\u73a9\u5bb6\u4e00\u76f4\u53d7\u7f5a\u76f4\u5230\u6210\u4e3a\u70b9\u6570\u6700\u5c0f"
         },
         "problem_set_limit": {
             "type": "problem_set_limit",
-            "name": "当前玩家接下来2局之内只能选择真心话",
+            "name": "\u5f53\u524d\u73a9\u5bb6\u63a5\u4e0b\u67652\u5c40\u4e4b\u5185\u53ea\u80fd\u9009\u62e9\u771f\u5fc3\u8bdd",
             "val": "1",
             "rounds": 2
         },
         "next_punish": {
             "type": "next_punish",
-            "name": "下一局的惩罚由当前所有受罚玩家承担。"
+            "name": "\u4e0b\u4e00\u5c40\u7684\u60e9\u7f5a\u7531\u5f53\u524d\u6240\u6709\u53d7\u7f5a\u73a9\u5bb6\u627f\u62c5\u3002"
         }
     }
 }
