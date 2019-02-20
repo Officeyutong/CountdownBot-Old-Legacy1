@@ -282,7 +282,7 @@ class Game:
             self.adjoint_punish.remove(minval[0])
             self.send_message("{} 已成为最小点数，下局起不再连带受罚。".format(
                 self.get_profile(minval[0])))
-        if not self.next_punish:
+        if  self.next_punish:
             # self.punish_list += self.next_punish
             self.punish_list = self.punish_list.union(self.next_punish)
             self.next_punish.clear()
@@ -291,6 +291,7 @@ class Game:
                 self.punish_list.add(maxval[0])
             else:
                 self.punish_list.add(minval[0])
+        print(self.punish_list)
         self.selector = minval[0]
         msg += "下面将会由点数最小的人([CQ:at,qq={}])选择惩罚方式:\n".format(minval[0])
         for k, v in get_problem_set_list().items():
@@ -314,7 +315,7 @@ class Game:
         self.points[player_id] = val
         self.non_played.remove(player_id)
         self.send_message(
-            "[CQ:at,qq={}] 你的点数为 {} ，看起来很不错呢qwq\n其他人:\n{}".format(player_id, val, self.get_status_distribute()))
+            "[CQ:at,qq={}] 你的点数为 {} ，看起来很不错呢qwq\n{}".format(player_id, val, self.get_status_distribute()))
         if not self.non_played:
             self._handle_play_end()
 
