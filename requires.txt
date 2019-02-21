@@ -5,3 +5,5 @@ sympy
 pyglet
 oss2
 baidu-aip
+pillow
+selenium
