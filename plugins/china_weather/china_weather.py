@@ -40,7 +40,7 @@ def take_screenshot(url)->bytes:
             }
             return actualTop;
         }"""
-    driver = webdriver.Chrome(executable_path="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe")
+    driver = webdriver.PhantomJS(config.PHANTOMJS_PATH)
     driver.get(url)
     driver.set_window_size(1920, 3080)
     buf = BytesIO(driver.get_screenshot_as_png())
