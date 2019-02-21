@@ -8,6 +8,7 @@ import global_vars
 import threading
 import urllib
 import base64
+import time
 config = global_vars.CONFIG[__name__]
 
 
@@ -80,6 +81,7 @@ def get_weather(bot, context, args):
     if city.strip() == "":
         bot.send(context, "请输入正确的城市名！")
         return
+    begin = time.time()
 
     def handle():
         with urllib.request.urlopen("http://toy1.weather.com.cn/search?cityname="+urllib.parse.quote(city)) as url:
@@ -91,8 +93,9 @@ def get_weather(bot, context, args):
             return
         image = take_screenshot(
             "http://www.weather.com.cn/weather1d/{}.shtml".format(data[0]["ref"].split("~")[0]))
-        to_send = '[CQ:image,file=base64://{}]'.format(
-            base64.encodebytes(image).decode("utf-8").replace("\n", ""))
+        end = time.time()
+        to_send = '[CQ:image,file=base64://{}]\n查询耗时 {}s.'.format(
+            base64.encodebytes(image).decode("utf-8").replace("\n", ""), (end-begin))
         # print(to_send)
         bot.send(context, to_send)
     threading.Thread(target=handle).start()
