@@ -18,11 +18,7 @@ def plugin():
 
 @command(name="read", help="文字转语音")
 def read(bot, context, args):
-
-    if len(args) < 2:
-        bot.send(context, "请输入文字")
-        return
-    string = "".join(args[1:])
+    string = " ".join(args[1:])
     if len(string) > config.MAX_STRING_LENGTH:
         bot.send(context, "字符串过长")
         return
