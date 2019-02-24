@@ -46,15 +46,25 @@ def weather(bot, context, args):
         forecast_weather = get_forecast_weather(args[1], config.KEY)
 
         if not now_weather['status'] == "ok":
-            bot.send(context,"Error: %s"% now_weather['status'])
+            bot.send(context,"Now Weather Error: %s"% now_weather['status'])
             return
-        
-        now_air = get_air(now_weather['basic']['parent_city'], config.KEY)
+
+        if not forecast_weather['status'] == "ok":
+            bot.send(context,"Forecast Weather Error: %s"% forecast_weather['status'])
+            return
+
+        now_air = get_air(now_weather['basic'][
+            'parent_city' if 'parent_city' in now_weather['basic'] else 'location'], config.KEY)
+
+        if not now_air['status'] == "ok":
+            now_air['air_now_city'] = {'qlty':"未知",'aqi':'未知'}
         
         location_data = "查询位置:%s,%s,%s,%s\n时区:%s\n更新时间:%s\n" % (
-            now_weather['basic']['location'], now_weather['basic']['parent_city'],
-            now_weather['basic']['admin_area'], now_weather['basic']['cnty'],
-            now_weather['basic']['tz'], now_weather['update']['loc'])
+            now_weather['basic']['location'], now_weather['basic'][
+                'parent_city' if 'parent_city' in now_weather['basic'] else 'location'],
+            now_weather['basic'][
+                'admin_area' if 'admin_area' in now_weather['basic'] else 'location'],
+            now_weather['basic']['cnty'], now_weather['basic']['tz'], now_weather['update']['loc'])
         
         now_data = "当前天气:%s\n当前温度:%s摄氏度\n风向风力:%s %s级\n空气质量:%s\n空气质量指数(AQI):%s\n" % (
             now_weather['now']['cond_txt'], now_weather['now']['tmp'],
