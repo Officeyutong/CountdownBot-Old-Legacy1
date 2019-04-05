@@ -1,5 +1,6 @@
 bot-data/
-group-*.json
+/plugins/sign_in/data/*
+user-*.json
 *_config.py
 plugins/data/*
 cats.json
