@@ -109,15 +109,18 @@ def get_reply(context):
         user_data['days'] = 1
         
     # 签到
-    delta = random.randint(10, 50-datetime.now().hour)
+    delta_days = (user_data['days']-1)*3
+    if delta_days > 30:
+        delta_days = 30
+    delta = random.randint(10, 50)+delta_days;
     user_data['rating'] += delta
     user_data['times_month'] += 1
     user_data['times_all'] += 1
     user_data['date'] = str(date.today())
 
     save_data(user_data, group_id, user_id)
-    return "给%s签到成功了！\n连续签到：%s天\n积分增加：%d\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
-        nickname, user_data['days'], delta, user_data['rating'], user_data['times_month'], user_data['times_all'])
+    return "给%s签到成功了！\n连续签到：%s天\n积分增加：%d\n连续签到加成：%d\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
+        nickname, user_data['days'], delta, delta_days, user_data['rating'], user_data['times_month'], user_data['times_all'])
 
 @web_app.route("/api/credit/get_by_group/<int:group_id>", methods=["POST", "GET"])
 def get_credit_by_group(group_id: int):
