@@ -112,7 +112,9 @@ def get_reply(context):
     delta_days = (user_data['days']-1)*3
     if delta_days > 30:
         delta_days = 30
-    delta = random.randint(10, 50)+delta_days;
+    if user_data['days'] >= 30:
+        delta_days = 50
+    delta = random.randint(30, 50)+delta_days;
     user_data['rating'] += delta
     user_data['times_month'] += 1
     user_data['times_all'] += 1
