@@ -8,6 +8,7 @@ import re
 import util
 config = global_vars.CONFIG[__name__]
 
+
 def plugin():
     return {
         "author": "officeyutong",
@@ -16,16 +17,30 @@ def plugin():
     }
 
 
-
-
-
 @command(name="hitokoto", help="发送一言")
 def hitokoto(bot: CQHttp, context=None, args=None):
     import util
+    while not args[-1].strip():
+        args.pop()
+    if len(args) > 1:
+        id = int(args[1])
+        import bs4
+        import urllib.request
+        with urllib.request.urlopen(f"https://hitokoto.cn/?id={id}") as f:
+            soup = bs4.BeautifulSoup(f.read().decode(),"lxml")
+            bot.send(context,
+                 f"""
+{soup.select_one("#hitokoto_text").get_text()}
+
+--- {soup.select_one("#hitokoto_author").get_text()}
+
+(id:{id})
+ """)
+        return
     bot.send(context, get_hitokoto())
 
 
-def get_hitokoto():
+def get_hitokoto(id=None):
     import urllib3
     import json
     urllib3.disable_warnings()
@@ -38,7 +53,7 @@ def get_hitokoto():
             
 --- {source}
     
-(Hitokoto ID:{id})""".format(text=data["hitokoto"], source=data["from"], id=data["id"])
+(Hitokoto ID:{id} https://hitokoto.cn/?id={id})""".format(text=data["hitokoto"], source=data["from"], id=data["id"])
     return to_send
 
 
