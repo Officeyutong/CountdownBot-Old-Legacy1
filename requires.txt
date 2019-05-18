@@ -8,3 +8,4 @@ baidu-aip
 pillow
 selenium
 bs4
+lxml
