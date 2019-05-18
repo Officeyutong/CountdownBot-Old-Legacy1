@@ -7,3 +7,4 @@ oss2
 baidu-aip
 pillow
 selenium
+bs4
