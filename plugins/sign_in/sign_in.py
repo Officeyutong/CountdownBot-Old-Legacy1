@@ -8,9 +8,13 @@ import json
 import random
 from datetime import datetime, date, timedelta
 from json import JSONDecoder, JSONEncoder
-web_app = global_vars.VARS["web_app"]
-DATA_PATH = os.path.join(os.path.dirname(__file__),"data/")
+from cqhttp import CQHttp
+import flask
+web_app: flask.Flask = global_vars.VARS["web_app"]
+DATA_PATH = os.path.join(os.path.dirname(__file__), "data/")
 config = global_vars.CONFIG[__name__]
+WEB_DIR = os.path.join(os.path.dirname(__file__), "web/")
+bot_ins: CQHttp = global_vars.VARS["bot"]
 
 
 def plugin():
@@ -26,9 +30,18 @@ def load():
     pass
 
 
+@web_app.route("/signin/rank", methods=["POST", "GET"])
+def view_signin():
+    return flask.send_from_directory(WEB_DIR, "rank.html")
+
+
 @command(name="签到", help="签到")
 def sign_in(bot, context, args):
-    bot.send(context, get_reply(context))
+    import socket
+    tail_string = "请前往 http://{}:{}/signin/rank 查看签到排名".format(
+        socket.gethostbyname(socket.gethostname()), global_vars.config.POST_PORT)
+    bot.send(context, get_reply(context)+"\n"+tail_string)
+
 
 def load_data(group_id, user_id):
 
@@ -44,7 +57,7 @@ def load_data(group_id, user_id):
         os.makedirs(group_path)
 
     # open./data/group-*/user-*json
-    file_path = os.path.join(group_path,"user-%s.json" % (user_id)) 
+    file_path = os.path.join(group_path, "user-%s.json" % (user_id))
 
     # read or touch json
     if os.path.exists(file_path):
@@ -63,7 +76,8 @@ def load_data(group_id, user_id):
 
     return data
 
-def save_data(data, group_id,user_id):
+
+def save_data(data, group_id, user_id):
     from global_vars import config
     import os
     import json
@@ -77,6 +91,7 @@ def save_data(data, group_id,user_id):
     with open(file_path, "w") as f:
         json.dump(data, f)
 
+
 def get_reply(context):
     group_id = str(context['group_id'])
 
@@ -86,7 +101,7 @@ def get_reply(context):
     sender = context['sender']
     user_id = str(sender['user_id'])
     nickname = sender['nickname']
-    
+
     user_data = load_data(group_id, user_id)
 
     today = datetime.strptime(str(date.today()), '%Y-%m-%d')
@@ -102,19 +117,19 @@ def get_reply(context):
     if last_day.month != today.month or last_day.year != today.year:
         user_data['times_month'] = 0
 
-    # 连续签到    
+    # 连续签到
     if last_day == yesterday:
         user_data['days'] += 1
     else:
         user_data['days'] = 1
-        
+
     # 签到
     delta_days = (user_data['days']-1)*3
     if delta_days > 30:
         delta_days = 30
     if user_data['days'] >= 30:
         delta_days = 50
-    delta = random.randint(30, 50)+delta_days;
+    delta = random.randint(30, 50)+delta_days
     user_data['rating'] += delta
     user_data['times_month'] += 1
     user_data['times_all'] += 1
@@ -124,14 +139,15 @@ def get_reply(context):
     return "给%s签到成功了！\n连续签到：%s天\n积分增加：%d\n连续签到加成：%d\n当前积分：%d\n本月签到次数：%d\n累计群签到次数：%d" % (
         nickname, user_data['days'], delta, delta_days, user_data['rating'], user_data['times_month'], user_data['times_all'])
 
+
 @web_app.route("/api/credit/get_by_group/<int:group_id>", methods=["POST", "GET"])
 def get_credit_by_group(group_id: int):
     if not os.path.exists(os.path.join(DATA_PATH, "group-{}".format(group_id))):
         return JSONEncoder().encode({
             "message": "Group not found.",
-            "status": -1
+            "ok": False
         })
-    
+
     group_path = os.path.join(DATA_PATH,
                               "group-{}/".format(group_id))
 
@@ -140,19 +156,31 @@ def get_credit_by_group(group_id: int):
     data = {}
     for user in os.listdir(group_path):
         user_id = pattern.findall(user)[0]
-        data[user_id] = load_data(group_id,user_id)
+        data[user_id] = load_data(group_id, user_id)
 
     result = []
     for key in data:
+        member_info = bot_ins.get_group_member_info(
+            group_id=group_id, user_id=key, no_cache=False)
         data[key]["id"] = key
+        data[key]["name"] = "{}({})".format(
+            member_info["card"], member_info["nickname"])
         result.append(data[key])
     result.sort(key=lambda x: x["rating"], reverse=True)
-    return JSONEncoder().encode(result)
+    return JSONEncoder().encode({"ok": True, "result": result})
+
 
 @web_app.route("/api/credit/get_groups", methods=["POST", "GET"])
 def get_groups():
-    result = []
+    result = {}
     pattern = re.compile(r"group-([0-9]+)")
+    all_groups = dict(map(lambda item: (
+        str(item["group_id"]), item["group_name"]), bot_ins.get_group_list()))
+    print(all_groups)
     for group in os.listdir(DATA_PATH):
-        result.append(pattern.findall(group)[0])
-    return JSONEncoder().encode(result)
+        group_id = pattern.findall(group)[0]
+        if group_id in all_groups:
+            result[group_id] = all_groups[group_id]
+    return JSONEncoder().encode({
+        "ok": True, "result": result
+    })

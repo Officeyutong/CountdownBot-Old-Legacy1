@@ -18,3 +18,5 @@ EXECUTE_DELAY = 60
 COMMAND_PREFIX = ["--", "!!"]
 # 指令执行间隔
 COMMAND_COOLDOWN = 0
+# 调试模式
+DEBUG = False
