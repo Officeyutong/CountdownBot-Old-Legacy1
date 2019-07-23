@@ -40,7 +40,7 @@ def sign_in(bot, context, args):
     import urllib
     import urllib.request
     with urllib.request.urlopen("https://ipinfo.io/ip") as urlf:
-        ip = urlf.read().decode()
+        ip = urlf.read().decode().strip()
 
     tail_string = "请前往 http://{}:{}/signin/rank 查看签到排名".format(
         ip, global_vars.config.POST_PORT)
