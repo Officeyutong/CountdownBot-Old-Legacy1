@@ -39,7 +39,12 @@
                 console.log(ret);
                 if (ret.ok) {
                     vue.groups = ret.result;
-                    vue.currentGroup = Object.entries(vue.groups)[0][0];
+                    let last = parseInt(window.location.href.split("/").pop());
+                    if (last != last) {
+                        vue.currentGroup = Object.entries(vue.groups)[0][0];
+                    } else {
+                        vue.currentGroup = last.toString();
+                    }
                     vue.ok = true;
                     vue.switchGroup(vue.currentGroup);
                 }
@@ -90,7 +95,7 @@
                                     <td>{[item.days]}</td>
                                     <td>{[item.times_all]}</td>
                                     <td>{[item.times_month]}</td>
-                                    
+
                                 </tr>
                             </tbody>
                         </table>

@@ -31,7 +31,8 @@ def load():
 
 
 @web_app.route("/signin/rank", methods=["POST", "GET"])
-def view_signin():
+@web_app.route("/signin/rank/<int:group_id>", methods=["POST", "GET"])
+def view_signin(group_id=None):
     return flask.send_from_directory(WEB_DIR, "rank.html")
 
 
@@ -42,8 +43,8 @@ def sign_in(bot, context, args):
     with urllib.request.urlopen("https://ipinfo.io/ip") as urlf:
         ip = urlf.read().decode().strip()
 
-    tail_string = "请前往 http://{}:{}/signin/rank 查看签到排名".format(
-        ip, global_vars.config.POST_PORT)
+    tail_string = "请前往 http://{}:{}/signin/rank/{} 查看签到排名".format(
+        ip, global_vars.config.POST_PORT,context["group_id"])
     bot.send(context, get_reply(context)+"\n"+tail_string)
 
 
@@ -164,8 +165,11 @@ def get_credit_by_group(group_id: int):
 
     result = []
     for key in data:
-        member_info = bot_ins.get_group_member_info(
-            group_id=group_id, user_id=key, no_cache=False)
+        try:
+            member_info = bot_ins.get_group_member_info(
+                group_id=group_id, user_id=key, no_cache=False)
+        except Exception as ex:
+            continue
         data[key]["id"] = key
         data[key]["name"] = "{}({})".format(
             member_info["card"], member_info["nickname"])
