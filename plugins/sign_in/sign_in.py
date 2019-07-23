@@ -37,9 +37,13 @@ def view_signin():
 
 @command(name="签到", help="签到")
 def sign_in(bot, context, args):
-    import socket
+    import urllib
+    import urllib.request
+    with urllib.request.urlopen("https://ipinfo.io/ip") as urlf:
+        ip = urlf.read().decode()
+
     tail_string = "请前往 http://{}:{}/signin/rank 查看签到排名".format(
-        socket.gethostbyname(socket.gethostname()), global_vars.config.POST_PORT)
+        ip, global_vars.config.POST_PORT)
     bot.send(context, get_reply(context)+"\n"+tail_string)
 
 
