@@ -15,6 +15,7 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "data/")
 config = global_vars.CONFIG[__name__]
 WEB_DIR = os.path.join(os.path.dirname(__file__), "web/")
 bot_ins: CQHttp = global_vars.VARS["bot"]
+public_ip = "[查询IP中...]"
 
 
 def plugin():
@@ -26,8 +27,18 @@ def plugin():
 
 
 def load():
-    # web_app =
-    pass
+    def fetch_ip():
+        global public_ip
+        import urllib
+        import urllib.request
+        with urllib.request.urlopen("https://ipinfo.io/ip") as urlf:
+            public_ip = urlf.read().decode().strip()
+            from util import print_log
+            print_log("IP爬取成功...{}".format(public_ip))
+    import threading
+    threading.Thread(target=fetch_ip).start()
+
+    
 
 
 @web_app.route("/signin/rank", methods=["POST", "GET"])
@@ -38,13 +49,10 @@ def view_signin(group_id=None):
 
 @command(name="签到", help="签到")
 def sign_in(bot, context, args):
-    import urllib
-    import urllib.request
-    with urllib.request.urlopen("https://ipinfo.io/ip") as urlf:
-        ip = urlf.read().decode().strip()
+
 
     tail_string = "请前往 http://{}:{}/signin/rank/{} 查看签到排名".format(
-        ip, global_vars.config.POST_PORT,context["group_id"])
+        public_ip, global_vars.config.POST_PORT, context["group_id"])
     bot.send(context, get_reply(context)+"\n"+tail_string)
 
 
