@@ -18,19 +18,26 @@
             let vue = new Vue({
                 delimiters: ["{[", "]}"],
                 el: "#main", data: {
-                    groups: [], currentGroup: "", ok: false, loading: true, groupData: []
+                    groups: [], currentGroup: "", ok: false, loading: true, groupData: [], buffer: {}
                 }, methods: {
                     switchGroup(groupID) {
                         this.currentGroup = groupID;
                         this.loading = true;
-                        $.post("/api/credit/get_by_group/" + groupID).done((ret) => {
-                            ret = JSON.parse(ret);
-                            if (ret.ok) {
-                                console.log(ret);
-                                vue.groupData = ret.result;
-                                vue.loading = false;
-                            }
-                        });
+                        if (this.buffer[groupID]) {
+                            vue.groupData = this.buffer[groupID];
+                            vue.loading = false;
+                        } else {
+                            $.post("/api/credit/get_by_group/" + groupID).done((ret) => {
+                                ret = JSON.parse(ret);
+                                if (ret.ok) {
+                                    console.log(ret);
+                                    vue.groupData = ret.result;
+                                    vue.loading = false;
+                                    this.buffer[groupID]=ret.result;
+                                    
+                                }
+                            });
+                        }
                     }
                 }
             });
