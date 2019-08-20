@@ -119,3 +119,8 @@ dmypy.json
 
 #Pycharm
 .idea
+
+# vscode config
+.vscode
+.vscode/*
+.vscode/settings.json
