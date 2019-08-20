@@ -14,9 +14,8 @@ def plugin():
         "description":"网易云点歌"
     }
 
-def search_music(key):
-    url = config.api_url + "/search?keywords=%s&limit=%d" % (urllib.parse.quote(key), config.search_limit)
-    data = None
+def search_music(key:str) -> dict:
+    url = config.API_URL + f"/search?keywords={urllib.parse.quote(key)}&limit={config.SEARCH_LIMIT}"
     with urllib.request.urlopen(url) as f:
         data = json.JSONDecoder().decode(f.read().decode("utf8"))
     if 'result' in data:
@@ -24,9 +23,8 @@ def search_music(key):
     else:
         return {'songCount':0}
 
-def check_music(music_id):
-    url = config.api_url + "/check/music?id=%d" % music_id
-    data = None
+def check_music(music_id:int) -> bool:
+    url = config.API_URL + f"/check/music?id={music_id}"
     try:
         with urllib.request.urlopen(url) as f:
             data = json.JSONDecoder().decode(f.read().decode("utf8"))
@@ -34,9 +32,8 @@ def check_music(music_id):
         return False
     return data['success']
 
-def get_music_url(music_id):
-    url = config.api_url + "/song/url?id=%d&br=320000" % music_id
-    data = None
+def get_music_url(music_id:int) -> str:
+    url = config.API_URL + f"/song/url?id={music_id}&br=320000"
     with urllib.request.urlopen(url) as f:
         data = json.JSONDecoder().decode(f.read().decode("utf8"))
     return data['data'][0]['url']
@@ -66,10 +63,10 @@ def music(bot,context,args):
                 return
             else:
                 if raw :
-                    bot.send(context,"[CQ:music,type=163,id=%d]" % music_id)
+                    bot.send(context,f"[CQ:music,type=163,id={music_id}]")
                 else:
                     url = get_music_url(music_id)
-                    bot.send(context,"[CQ:record,file=%s]" % url)
+                    bot.send(context,f"[CQ:record,file={url}]")
                 return
         
         key = " ".join(args[1:])
@@ -83,10 +80,10 @@ def music(bot,context,args):
             music_id = item['id']
             if check_music(music_id):
                 if raw:
-                    bot.send(context,"[CQ:music,type=163,id=%d]" % music_id)
+                    bot.send(context,f"[CQ:music,type=163,id={music_id}]")
                 else:
                     url = get_music_url(music_id)
-                    bot.send(context,"[CQ:record,file=%s]" % url)
+                    bot.send(context,f"[CQ:record,file={url}]")
                 return
         
         bot.send(context,"您搜索的歌曲不存在或无版权")
@@ -94,5 +91,3 @@ def music(bot,context,args):
     threading.Thread(target=handle).start()
            
                 
-
-        
