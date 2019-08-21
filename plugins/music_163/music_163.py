@@ -20,6 +20,9 @@ def login():
         url = config.API_URL + f"/login/cellphone?phone={config.PHONE}&password={config.PASSWORD}" 
     elif config.LOGIN_MODE == "email":
         url = config.API_URL + f"/login?email={config.EMAIL}&password={config.PASSWORD}"
+    else:
+        return
+    
     with urllib.request.urlopen(url) as f:
         data = json.JSONDecoder().decode(f.read().decode("utf8"))
     
