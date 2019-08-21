@@ -5,4 +5,4 @@ SEARCH_LIMIT = 10
 LOGIN_MODE = "phone" # "phone" or "email" 其他则不登录
 PHONE = ""
 EMAIL = ""
-PASSWOED = ""
+PASSWORD = ""
