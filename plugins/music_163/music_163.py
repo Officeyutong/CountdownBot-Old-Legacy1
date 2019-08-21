@@ -4,6 +4,7 @@ import threading
 import urllib.parse,urllib.request,urllib.error
 import json
 import base64
+from util import print_log
 
 config = CONFIG[__name__]
 
@@ -13,6 +14,20 @@ def plugin():
         "version":1.0,
         "description":"网易云点歌"
     }
+ 
+def login():
+    if config.LOGIN_MODE == "phone":
+        url = config.API_URL + f"/login/cellphone?phone={config.PHONE}&password={config.PASSWORD}" 
+    elif config.LOGIN_MODE == "email":
+        url = config.API_URL + f"/login?email={config.EMAIL}&password={config.PASSWORD}"
+    with urllib.request.urlopen(url) as f:
+        data = json.JSONDecoder().decode(f.read().decode("utf8"))
+    
+    if data['code'] == 200:
+        print_log("登陆成功!")
+    else:
+        print_log("登陆失败！请检查账号密码！")
+
 
 def search_music(key:str) -> dict:
     url = config.API_URL + f"/search?keywords={urllib.parse.quote(key)}&limit={config.SEARCH_LIMIT}"
@@ -56,7 +71,8 @@ def music(bot,context,args):
             except ValueError as ex:
                 bot.send(context,"请输入正确的id")
                 return
-        
+        login()
+
         if music_id != -1:
             if not check_music(music_id):
                 bot.send(context,"id对应的音乐不存在或无版权")
