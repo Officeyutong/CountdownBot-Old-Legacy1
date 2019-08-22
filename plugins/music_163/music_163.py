@@ -63,8 +63,12 @@ def music(bot,context,args):
 
     def handle():
         raw = False
+        link = False
         if args [-1] == "raw":
             raw = True
+            del args[-1]
+        elif args[-1] == "link":
+            link = True
             del args[-1]
 
         music_id = -1
@@ -85,7 +89,10 @@ def music(bot,context,args):
                     bot.send(context,f"[CQ:music,type=163,id={music_id}]")
                 else:
                     url = get_music_url(music_id)
-                    bot.send(context,f"[CQ:record,file={url}]")
+                    if link:
+                        bot.send(context, url)
+                    else:
+                        bot.send(context,f"[CQ:record,file={url}]")
                 return
         
         key = " ".join(args[1:])
@@ -102,7 +109,10 @@ def music(bot,context,args):
                     bot.send(context,f"[CQ:music,type=163,id={music_id}]")
                 else:
                     url = get_music_url(music_id)
-                    bot.send(context,f"[CQ:record,file={url}]")
+                    if link:
+                        bot.send(context,url)
+                    else:
+                        bot.send(context,f"[CQ:record,file={url}]")
                 return
         
         bot.send(context,"您搜索的歌曲不存在或无版权")
