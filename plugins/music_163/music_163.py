@@ -75,7 +75,7 @@ def music(bot,context,args):
         if args[1] == "id":
             try:
                 music_id = int(args[2])
-            except ValueError as ex:
+            except ValueError as err:
                 bot.send(context,"请输入正确的id")
                 return
         login()
