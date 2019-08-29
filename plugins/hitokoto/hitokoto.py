@@ -73,5 +73,8 @@ def execute_hitokoto_broadcast():
     message = get_hitokoto()
     import util
     for group_id in get_hitokoto_groups(config.HITOKOTO_BROADCAST_LIST):
-        bot.send_msg(message_type="group", group_id=int(
-            group_id), message=message)
+        try:
+            bot.send_msg(message_type="group", group_id=int(
+                group_id), message=message)
+        except Exception as ex:
+            print_log(ex)
