@@ -59,12 +59,6 @@ def weather(bot, context, args):
         if not now_air['status'] == "ok":
             now_air['air_now_city'] = {'qlty':"未知",'aqi':'未知'}
         
-        # 你猜我在干什么
-        if now_weather['basic']['admin_area'] == "香港" :
-            now_weather['basic']['cnty'] = "香港"
-        if now_weather['basic']['admin_area'] == "台湾" :
-            now_weather['basic']['cnty'] = "台湾"
-
         location_data = "查询位置:%s,%s,%s,%s\n时区:%s\n更新时间:%s\n" % (
             now_weather['basic']['location'], now_weather['basic'][
                 'parent_city' if 'parent_city' in now_weather['basic'] else 'location'],

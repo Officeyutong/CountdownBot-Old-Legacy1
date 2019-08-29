@@ -47,6 +47,7 @@ def check_music(music_id:int) -> bool:
         with urllib.request.urlopen(url) as f:
             data = json.JSONDecoder().decode(f.read().decode("utf8"))
     except urllib.error.HTTPError as err:
+        print_log(err)
         return False
     return data['success']
 
@@ -75,7 +76,8 @@ def music(bot,context,args):
         if args[1] == "id":
             try:
                 music_id = int(args[2])
-            except ValueError as ex:
+            except ValueError as err:
+                print_log(err)
                 bot.send(context,"请输入正确的id")
                 return
         login()
