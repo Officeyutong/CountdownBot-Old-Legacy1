@@ -25,7 +25,7 @@ def plugin():
 
 
 @command(name="rand", help="生成随机数.rand 随机上限 数量(可省略)")
-def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None):
+def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None) -> None:
     while args and args[-1].strip() == "":
         del args[-1]
     try:
@@ -34,7 +34,7 @@ def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None):
         bot.send(context, "请输入合法参数")
         raise ex
         # return
-    print(other, upper)
+    # print(other, upper)
     if not other:
         count = 1
     else:
@@ -42,14 +42,14 @@ def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None):
     if count > config.MAX_NUMBER_COUNT:
         bot.send(context, "您输入的数值过大")
         return
-    print(upper, count)
+    # print(upper, count)
     from io import StringIO
     from random import randint
     buf = StringIO()
     buf.write("随机数结果:\n")
     for x in range(count):
         buf.write(f"{randint(1,upper)}\n")
-    print(buf.getvalue())
-    print(buf.getvalue())
+    # print(buf.getvalue())
+    # print(buf.getvalue())
 
     bot.send(context, buf.getvalue())
