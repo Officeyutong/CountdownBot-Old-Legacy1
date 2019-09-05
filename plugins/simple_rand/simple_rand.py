@@ -13,7 +13,7 @@ import docker
 import util
 import global_vars
 from typing import List
-# config = global_vars.CONFIG[__name__]
+config = global_vars.CONFIG[__name__]
 
 
 def plugin():
@@ -26,7 +26,7 @@ def plugin():
 
 @command(name="rand", help="生成随机数.rand 随机上限 数量(可省略)")
 def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None):
-    while args and args[-1].strip()=="":
+    while args and args[-1].strip() == "":
         del args[-1]
     try:
         upper, *other = (int(x) for x in args[1:])
@@ -34,12 +34,15 @@ def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None):
         bot.send(context, "请输入合法参数")
         raise ex
         # return
-    print(other,upper)
+    print(other, upper)
     if not other:
         count = 1
     else:
         count = other[0]
-    print(upper,count)
+    if count > config.MAX_NUMBER_COUNT:
+        bot.send(context, "您输入的数值过大")
+        return
+    print(upper, count)
     from io import StringIO
     from random import randint
     buf = StringIO()
@@ -48,5 +51,5 @@ def simple_rand(bot: CQHttp, context: dict = None, args: List[str] = None):
         buf.write(f"{randint(1,upper)}\n")
     print(buf.getvalue())
     print(buf.getvalue())
-    
+
     bot.send(context, buf.getvalue())
