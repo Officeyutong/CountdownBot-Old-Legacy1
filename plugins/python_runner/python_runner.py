@@ -14,14 +14,13 @@ import util
 import global_vars
 config = global_vars.CONFIG[__name__]
 
+
 def plugin():
     return {
         "author": "officeyutong",
         "version": 1.0,
         "description": "可以在Docker内运行Python代码."
     }
-
-
 
 
 @command(name="exec", help="在Docker中执行Python3.6代码")
@@ -33,6 +32,7 @@ def exec_python_code(bot: CQHttp, context=None, args=None):
     for item in pattern.findall(code):
         code = code.replace("&#{};".format(
             item), bytes([int(item)]).decode("utf-8"))
+    code = f"""CALLER_UID={context['user_id']}\nCALLER_NICKNAME='{context['sender']['nickname']}'\nCALLER_CARD='{context['sender']['card']}'\n"""+code
     run_python_in_docker(callback, code)
 
 
