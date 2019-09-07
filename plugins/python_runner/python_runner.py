@@ -32,11 +32,7 @@ def exec_python_code(bot: CQHttp, context=None, args=None):
     for item in pattern.findall(code):
         code = code.replace("&#{};".format(
             item), bytes([int(item)]).decode("utf-8"))
-    code = f"""
-    CALLER_UID={context['user_id']}\n
-    CALLER_NICKNAME={str(context['sender']['nickname']).encode()}.decode()\n
-    CALLER_CARD={str(context['sender']['card']).encode()}.decode()\n
-    """+code
+    code = f"""CALLER_UID={context['user_id']}\nCALLER_NICKNAME={str(context['sender']['nickname']).encode()}.decode()\nCALLER_CARD={str(context['sender']['card']).encode()}.decode()\n"""+code
     run_python_in_docker(callback, code)
 
 
