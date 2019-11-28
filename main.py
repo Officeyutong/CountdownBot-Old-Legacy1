@@ -128,6 +128,11 @@ def handle_message(context):
 
 @bot.on_request("group", "friend")
 def handle_group_invite(context):
+    print(context)
+    # 不处理加群请求
+    if context["request_type"] == "group" and context["sub_type"] == "add":
+        return {}
+
     return {"approve": True}
 
 
