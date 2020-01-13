@@ -141,6 +141,58 @@ def series(bot: CQHttp, context: dict, args: List[str]) -> None:
     thread.start()
 
 
+@command(name="plot", help="绘制函数图像 plot 起始点 终点 函数")
+def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
+
+    def process():
+        begin, end = float(args[1]), float(args[2])
+        func = "".join(map(lambda x: x+" ", args[3:]))
+        print_log(f"drawing {func}, {begin}, {end}")
+        import numpy
+        if end-begin > config.MATPLOT_RANGE_LENGTH:
+            bot.send(context, "绘制区间过长")
+            return
+
+        def plot():
+            print_log("Starting...")
+            try:
+                import matplotlib.pyplot as plt
+                from io import BytesIO
+                func_code = compile(func, "qwq", "eval")
+                print(begin, end)
+                x = numpy.arange(begin, end, 0.1)
+                y = eval(func_code, None, {**{key: getattr(
+                    numpy.math, key) for key in dir(numpy.math)}, "x": x})
+                buf = BytesIO()
+                plt.cla()
+                fig = plt.figure(func)
+                plt.plot(x,y)
+                fig.canvas.print_png(buf)
+                # import tempfile
+                # tmpf = tempfile.mktemp(".png")
+                # with open(tmpf, "wb") as f:
+                #     f.write(buf.getvalue())
+                # print(tmpf)
+                bot.send(context, "[CQ:image,file=base64://{}]".format(
+                    base64.encodebytes(buf.getvalue()).decode(
+                         "utf-8").replace("\n", "")))
+            except Exception as ex:
+                bot.send(context, ("{}".format(ex))[:300])
+                raise ex
+            print_log("Done...")
+        thd2 = threading.Thread(target=plot)
+        thd2.start()
+        begin_time = time.time()
+        while time.time()-begin_time < 5:
+            time.sleep(0.1)
+        if thd2.is_alive():
+            bot.send(context, "级数{}运行超时.".format(func))
+            util.stop_thread(thd2)
+
+    thread = threading.Thread(target=process)
+    thread.start()
+
+
 def renderLatex(formula: str) -> BytesIO:
     from sympy import preview
     print_log("Rendering {}".format(formula))

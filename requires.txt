@@ -9,3 +9,5 @@ pillow
 selenium
 bs4
 lxml
+numpy
+matplotlib
