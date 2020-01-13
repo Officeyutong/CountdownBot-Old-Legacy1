@@ -186,7 +186,8 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
         while time.time()-begin_time < 5:
             time.sleep(0.1)
         if thd2.is_alive():
-            bot.send(context, "级数{}运行超时.".format(func))
+            bot.send(context, "绘图{}运行超时.".format(func))
+            print("超时..")
             util.stop_thread(thd2)
 
     thread = threading.Thread(target=process)
