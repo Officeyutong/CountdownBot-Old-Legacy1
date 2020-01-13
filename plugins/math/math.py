@@ -183,7 +183,7 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
         thd2 = threading.Thread(target=plot)
         thd2.start()
         begin_time = time.time()
-        while time.time()-begin_time < 5:
+        while time.time()-begin_time < 10:
             time.sleep(0.1)
         if thd2.is_alive():
             bot.send(context, "绘图{}运行超时.".format(func))
