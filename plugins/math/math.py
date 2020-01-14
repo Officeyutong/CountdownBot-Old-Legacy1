@@ -173,20 +173,22 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
     }
 
     def process():
-        begin, end = float(args[1]), float(args[2])
-        functions = ("".join(map(lambda x: x+" ", args[3:]))).split(",")
-        if len(functions) > config.FUNCTION_COUNT_LIMIT:
-            bot.send(context, "绘制函数过多")
-            return
-        print_log(f"drawing {functions}, {begin}, {end}")
-        import numpy
-        if end-begin > config.MATPLOT_RANGE_LENGTH:
-            bot.send(context, "绘制区间过长")
-            return
 
         def plot():
+
             print_log("Starting...")
             try:
+                begin, end = float(args[1]), float(args[2])
+                functions = ("".join(map(lambda x: x+" ", args[3:]))).split(",")
+                if len(functions) > config.FUNCTION_COUNT_LIMIT:
+                    bot.send(context, "绘制函数过多")
+                    return
+                print_log(f"drawing {functions}, {begin}, {end}")
+                import numpy
+                if end-begin > config.MATPLOT_RANGE_LENGTH:
+                    bot.send(context, "绘制区间过长")
+                    return
+
                 import matplotlib.pyplot as plt
                 from io import BytesIO
                 # func_code = compile(func, "qwq", "eval")
@@ -205,11 +207,11 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
                     }))
                 # plt.plot(x, y)
                 fig.canvas.print_png(buf)
-                import tempfile
-                tmpf = tempfile.mktemp(".png")
-                with open(tmpf, "wb") as f:
-                    f.write(buf.getvalue())
-                print(tmpf)
+                # import tempfile
+                # tmpf = tempfile.mktemp(".png")
+                # with open(tmpf, "wb") as f:
+                #     f.write(buf.getvalue())
+                # print(tmpf)
                 bot.send(context, "[CQ:image,file=base64://{}]".format(
                     base64.encodebytes(buf.getvalue()).decode(
                          "utf-8").replace("\n", "")))
