@@ -17,7 +17,7 @@ config = global_vars.CONFIG[__name__]
 def plugin():
     return {
         "author": "officeyutong",
-        "version": 1.0,
+        "version": 2.0,
         "description": "sympy功能封装"
     }
 
@@ -143,11 +143,42 @@ def series(bot: CQHttp, context: dict, args: List[str]) -> None:
 
 @command(name="plot", help="绘制函数图像 plot 起始点 终点 函数")
 def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
+    import numpy as np
+    MATH_NAMES = {
+        "sin": np.sin,
+        "cos": np.cos,
+        "tan": np.tan,
+        "exp": np.exp,
+        "floor": np.floor,
+        "around": np.around,
+        "log": np.log,
+        "log10": np.log10,
+        "log2": np.log2,
+        "sinh": np.sinh,
+        "cosh": np.cosh,
+        "tanh": np.tanh,
+        "arcsin": np.arcsin,
+        "arccos": np.arccos,
+        "arctan": np.arctan,
+        "arcsinh": np.arcsinh,
+        "arccosh": np.arccosh,
+        "arctanh": np.arctanh,
+        "abs": np.abs,
+        "sqrt": np.sqrt,
+        "log1p": np.log1p,
+        "sign": np.sign,
+        "ceil": np.ceil,
+        "modf": np.modf,
+        "pi": np.pi
+    }
 
     def process():
         begin, end = float(args[1]), float(args[2])
-        func = "".join(map(lambda x: x+" ", args[3:]))
-        print_log(f"drawing {func}, {begin}, {end}")
+        functions = ("".join(map(lambda x: x+" ", args[3:]))).split(",")
+        if len(functions) > config.FUNCTION_COUNT_LIMIT:
+            bot.send(context, "绘制函数过多")
+            return
+        print_log(f"drawing {functions}, {begin}, {end}")
         import numpy
         if end-begin > config.MATPLOT_RANGE_LENGTH:
             bot.send(context, "绘制区间过长")
@@ -158,21 +189,27 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
             try:
                 import matplotlib.pyplot as plt
                 from io import BytesIO
-                func_code = compile(func, "qwq", "eval")
-                print(begin, end)
+                # func_code = compile(func, "qwq", "eval")
                 x = numpy.arange(begin, end, 0.1)
-                y = eval(func_code, None, {**{key: getattr(
-                    numpy.math, key) for key in dir(numpy.math)}, "x": x})
+                print(begin, end)
+
+                # y = eval(func_code, None, {**{key: getattr(
+                #     numpy.math, key) for key in dir(numpy.math)}, "x": x})
                 buf = BytesIO()
                 plt.cla()
-                fig = plt.figure(func)
-                plt.plot(x,y)
+                fig = plt.figure(",".join(functions))
+                for func in functions:
+                    plt.plot(x, eval(func, None, {
+                        "x": x,
+                        **MATH_NAMES
+                    }))
+                # plt.plot(x, y)
                 fig.canvas.print_png(buf)
-                # import tempfile
-                # tmpf = tempfile.mktemp(".png")
-                # with open(tmpf, "wb") as f:
-                #     f.write(buf.getvalue())
-                # print(tmpf)
+                import tempfile
+                tmpf = tempfile.mktemp(".png")
+                with open(tmpf, "wb") as f:
+                    f.write(buf.getvalue())
+                print(tmpf)
                 bot.send(context, "[CQ:image,file=base64://{}]".format(
                     base64.encodebytes(buf.getvalue()).decode(
                          "utf-8").replace("\n", "")))
