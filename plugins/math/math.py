@@ -192,7 +192,7 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
                 import matplotlib.pyplot as plt
                 from io import BytesIO
                 # func_code = compile(func, "qwq", "eval")
-                x = numpy.arange(begin, end, 0.1)
+                x = numpy.arange(begin, end, 0.01)
                 print(begin, end)
 
                 # y = eval(func_code, None, {**{key: getattr(
