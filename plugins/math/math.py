@@ -1,3 +1,4 @@
+import numpy as np
 from cqhttp import CQHttp
 from util import print_log
 from register import command
@@ -12,6 +13,34 @@ from io import BytesIO
 import global_vars
 from typing import List
 config = global_vars.CONFIG[__name__]
+
+MATH_NAMES = {
+    "sin": np.sin,
+    "cos": np.cos,
+    "tan": np.tan,
+    "exp": np.exp,
+    "floor": np.floor,
+    "around": np.around,
+    "log": np.log,
+    "log10": np.log10,
+    "log2": np.log2,
+    "sinh": np.sinh,
+    "cosh": np.cosh,
+    "tanh": np.tanh,
+    "arcsin": np.arcsin,
+    "arccos": np.arccos,
+    "arctan": np.arctan,
+    "arcsinh": np.arcsinh,
+    "arccosh": np.arccosh,
+    "arctanh": np.arctanh,
+    "abs": np.abs,
+    "sqrt": np.sqrt,
+    "log1p": np.log1p,
+    "sign": np.sign,
+    "ceil": np.ceil,
+    "modf": np.modf,
+    "pi": np.pi
+}
 
 
 def plugin():
@@ -143,34 +172,6 @@ def series(bot: CQHttp, context: dict, args: List[str]) -> None:
 
 @command(name="plot", help="绘制函数图像 plot 起始点 终点 函数")
 def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
-    import numpy as np
-    MATH_NAMES = {
-        "sin": np.sin,
-        "cos": np.cos,
-        "tan": np.tan,
-        "exp": np.exp,
-        "floor": np.floor,
-        "around": np.around,
-        "log": np.log,
-        "log10": np.log10,
-        "log2": np.log2,
-        "sinh": np.sinh,
-        "cosh": np.cosh,
-        "tanh": np.tanh,
-        "arcsin": np.arcsin,
-        "arccos": np.arccos,
-        "arctan": np.arctan,
-        "arcsinh": np.arcsinh,
-        "arccosh": np.arccosh,
-        "arctanh": np.arctanh,
-        "abs": np.abs,
-        "sqrt": np.sqrt,
-        "log1p": np.log1p,
-        "sign": np.sign,
-        "ceil": np.ceil,
-        "modf": np.modf,
-        "pi": np.pi
-    }
 
     def process():
 
@@ -179,7 +180,8 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
             print_log("Starting...")
             try:
                 begin, end = float(args[1]), float(args[2])
-                functions = ("".join(map(lambda x: x+" ", args[3:]))).split(",")
+                functions = (
+                    "".join(map(lambda x: x+" ", args[3:]))).split(",")
                 if len(functions) > config.FUNCTION_COUNT_LIMIT:
                     bot.send(context, "绘制函数过多")
                     return
@@ -191,12 +193,9 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
 
                 import matplotlib.pyplot as plt
                 from io import BytesIO
-                # func_code = compile(func, "qwq", "eval")
+
                 x = numpy.arange(begin, end, 0.01)
                 print(begin, end)
-
-                # y = eval(func_code, None, {**{key: getattr(
-                #     numpy.math, key) for key in dir(numpy.math)}, "x": x})
                 buf = BytesIO()
                 plt.cla()
                 fig = plt.figure(",".join(functions))
@@ -205,13 +204,74 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
                         "x": x,
                         **MATH_NAMES
                     }))
-                # plt.plot(x, y)
                 fig.canvas.print_png(buf)
-                # import tempfile
-                # tmpf = tempfile.mktemp(".png")
-                # with open(tmpf, "wb") as f:
-                #     f.write(buf.getvalue())
-                # print(tmpf)
+                bot.send(context, "[CQ:image,file=base64://{}]".format(
+                    base64.encodebytes(buf.getvalue()).decode(
+                         "utf-8").replace("\n", "")))
+            except Exception as ex:
+                bot.send(context, ("{}".format(ex))[:300])
+                raise ex
+            print_log("Done...")
+        thd2 = threading.Thread(target=plot)
+        thd2.start()
+        begin_time = time.time()
+        while time.time()-begin_time < 10:
+            time.sleep(0.1)
+        if thd2.is_alive():
+            bot.send(context, "绘图{}运行超时.".format(func))
+            print("超时..")
+            util.stop_thread(thd2)
+
+    thread = threading.Thread(target=process)
+    thread.start()
+
+
+@command(name="plotpe", help="绘制参数方程图像 参数起始 参数终止 x方程1:y方程1[,x方程2:y方程2[,...]]")
+def plotpe(bot: CQHttp, context: dict, args: List[str]) -> None:
+
+    def process():
+
+        def plot():
+
+            print_log("Starting...")
+            try:
+                begin, end = float(args[1]), float(args[2])
+                functions = (
+                    "".join(map(lambda x: x+" ", args[3:]))).split(",")
+                if len(functions) > config.FUNCTION_COUNT_LIMIT:
+                    bot.send(context, "绘制函数过多")
+                    return
+                print_log(f"drawing {functions}, {begin}, {end}")
+                import numpy
+                if end-begin > config.MATPLOT_RANGE_LENGTH:
+                    bot.send(context, "绘制区间过长")
+                    return
+
+                import matplotlib.pyplot as plt
+                from io import BytesIO
+
+                ts = np.arange(begin, end, 0.01)
+                print(begin, end)
+                buf = BytesIO()
+                plt.cla()
+                fig = plt.figure(",".join(functions))
+                for func in functions:
+                    func_x, func_y = func.split(":")
+
+                    plt.plot(eval(func_x, None, {
+                        "t": ts,
+                        **MATH_NAMES
+                    }), eval(func_y, None, {
+                        "t": ts,
+                        **MATH_NAMES
+                    }))
+                fig.canvas.print_png(buf)
+                import tempfile
+                tmpf = tempfile.mktemp(".png")
+                with open(tmpf, "wb") as f:
+                    f.write(buf.getvalue())
+                print(tmpf)
+
                 bot.send(context, "[CQ:image,file=base64://{}]".format(
                     base64.encodebytes(buf.getvalue()).decode(
                          "utf-8").replace("\n", "")))
