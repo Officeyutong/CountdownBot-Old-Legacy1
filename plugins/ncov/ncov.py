@@ -28,6 +28,8 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
     # print(broadcast.text)
     from io import StringIO
     buf = StringIO()
+    buf.write("数据来源: 丁香医生\n")
+    buf.write(str(soup.select_one(".mapTitle___2QtRg").text)+"\n")
     buf.write(broadcast.text)
     buf.write("\n\n")
 
