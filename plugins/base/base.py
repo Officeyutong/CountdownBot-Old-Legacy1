@@ -65,6 +65,23 @@ def reload_config(args):
         print("%s = %s" % (item, getattr(global_config, item)))
 
 
+@console_command(name="broadcast", help="在所有此Bot所在的群里广播消息")
+def broadcast_message(args):
+    from io import StringIO
+    buf = StringIO()
+    for text in args[1:]:
+        buf.write(text)
+        buf.write(" ")
+    bot: CQHttp = global_vars.VARS["bot"]
+    message = buf.getvalue().strip()
+    print("Message = ", f"'{message}'")
+    for group in bot.get_group_list():
+        group_id = group["group_id"]
+        print("Sending..", group_id)
+        bot.send_message(message_type="group",
+                         group_id=group_id, message=message)
+
+
 @command(name="about", help="关于")
 def about(bot: CQHttp, context=None, args=None):
     bot.send(context, "https://gitee.com/yutong_java/Countdown-Bot")
