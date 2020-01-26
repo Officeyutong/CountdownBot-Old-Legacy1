@@ -58,7 +58,7 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
         handle_global()
     else:
         for item in data:
-            if args[1] in item["provinceShortName"]:
+            if args[1] in item["provinceName"]:
                 handle_province(item)
                 return
         bot.send(context, "请输入正确的省份名称")
