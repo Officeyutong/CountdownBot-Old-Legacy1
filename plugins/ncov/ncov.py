@@ -62,3 +62,31 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
                 handle_province(item)
                 return
         bot.send(context, "请输入正确的省份名称")
+
+
+@command(name="ncovnews", help="查询2019nCov最近5条实时播报")
+def ncov_news(bot: CQHttp, context=None, args: List[str] = None):
+    import bs4
+    import requests
+    import re
+    import json
+    with requests.get("https://3g.dxy.cn/newh5/view/pneumonia") as urlf:
+        soup = bs4.BeautifulSoup(urlf.content.decode("utf-8"), "lxml")
+    script = soup.select_one("#getTimelineService")
+    expr = re.compile(r"(\[.*\])")
+
+    data: List[Dict[str, dict]] = json.JSONDecoder().decode(
+        expr.search(script.string).groups()[0])
+    # print(broadcast.text)
+    from io import StringIO
+    buf = StringIO()
+    buf.write("数据来源: 丁香医生\n")
+    buf.write(str(soup.select_one(".mapTitle___2QtRg").text)+"\n")
+    buf.write("\n\n")
+    for item in data[:5]:
+        buf.write(f"""{item["title"]} - {item["infoSource"]} - {item["pubDateStr"]}
+        {item["sourceUrl"]}
+        {item["summary"]}
+
+        """)
+    bot.send(context, buf.getvalue())
