@@ -36,7 +36,7 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
 
     def handle_province(obj):
         buf.write(generate_line(obj))
-        buf.write("\n")
+        buf.write("\n\n")
         for city in obj["cities"]:
             buf.write(generate_line(city)+"\n")
         # print(buf.getvalue())
