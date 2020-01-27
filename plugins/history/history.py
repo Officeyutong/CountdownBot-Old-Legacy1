@@ -27,7 +27,7 @@ def get_histroy(date: str, key: str) -> list:
         return []
 
 
-@command(name="histrory", help="历史上的今天，参数为月和日")
+@command(name="history", help="历史上的今天，参数为月和日")
 def history(bot, context, args):
     while args[-1] == "":
         del args[-1]
