@@ -68,4 +68,4 @@ def history(bot, context, args):
         
         bot.send(context,buf.getvalue())
 
-    threading.Thread(target=headle).start()
+    threading.Thread(target=handle).start()
