@@ -30,13 +30,13 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
         r"= (\{.*\})\}catch").search(soup.select_one("#getStatisticsService").string).groups()[0])
 
     # broadcast = soup.select_one(".count___3GCdh)
-    total_confirmed = sum((item["confirmedCount"] for item in data))
-    total_suspected = sum((item["suspectedCount"] for item in data))
-    total_cured = sum((item["curedCount"] for item in data))
-    total_dead = sum((item["deadCount"] for item in data))
+    # total_confirmed = sum((item["confirmedCount"] for item in data))
+    # total_suspected = sum((item["suspectedCount"] for item in data))
+    # total_cured = sum((item["curedCount"] for item in data))
+    # total_dead = sum((item["deadCount"] for item in data))
     update_time: time.struct_time = time.localtime(
         statistics["modifyTime"]//1000)
-    broadcast = f"{total_confirmed} 确认 | {total_suspected} 疑似 | {total_cured} 治愈 | {total_dead} 死亡\n更新于{time.strftime('%Y.%m.%d %H:%M:%S', update_time)}"
+    broadcast = f"{statistics['confirmedCount']} 确认 | {statistics['suspectedCount']} 疑似 | {statistics['curedCount']} 治愈 | {statistics['deadCount']} 死亡\n更新于{time.strftime('%Y.%m.%d %H:%M:%S', update_time)}"
     from io import StringIO
     buf = StringIO()
     buf.write("数据来源: 丁香医生\n")
