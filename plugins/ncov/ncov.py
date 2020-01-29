@@ -17,6 +17,8 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
     import requests
     import re
     import json
+    import time
+    import datetime
     with requests.get("https://3g.dxy.cn/newh5/view/pneumonia") as urlf:
         soup = bs4.BeautifulSoup(urlf.content.decode("utf-8"), "lxml")
     script = soup.select_one("#getAreaStat")
@@ -24,13 +26,22 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
 
     data: List[Dict[str, dict]] = json.JSONDecoder().decode(
         expr.search(script.string).groups()[0])
-    broadcast = soup.select_one(".content___2hIPS")
-    # print(broadcast.text)
+    statistics = json.JSONDecoder().decode(re.compile(
+        r"= (\{.*\})\}catch").search(soup.select_one("#getStatisticsService").string).groups()[0])
+
+    # broadcast = soup.select_one(".count___3GCdh)
+    total_confirmed = sum((item["confirmedCount"] for item in data))
+    total_suspected = sum((item["suspectedCount"] for item in data))
+    total_cured = sum((item["curedCount"] for item in data))
+    total_dead = sum((item["deadCount"] for item in data))
+    update_time: time.struct_time = time.localtime(
+        statistics["modifyTime"]//1000)
+    broadcast = f"{total_confirmed} 确认 | {total_suspected} 疑似 | {total_cured} 治愈 | {total_dead} 死亡\n更新于{time.strftime('%Y.%m.%d %H:%M:%S', update_time)}"
     from io import StringIO
     buf = StringIO()
     buf.write("数据来源: 丁香医生\n")
-    buf.write(str(soup.select_one(".mapTitle___2QtRg").text)+"\n")
-    buf.write(broadcast.text)
+    # buf.write(str(soup.select_one(".title___2d1_B").cmd.text)+"\n")
+    buf.write(broadcast)
     buf.write("\n\n")
 
     def generate_line(obj):
@@ -41,14 +52,11 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
         buf.write("\n\n")
         for city in obj["cities"]:
             buf.write(generate_line(city)+"\n")
-        # print(buf.getvalue())
         bot.send(context, buf.getvalue())
 
     def handle_global():
-
         for item in data:
             buf.write(generate_line(item)+"\n")
-        # print(buf.getvalue())
         bot.send(context, buf.getvalue())
 
     while args and args[-1].strip() == "":
@@ -70,6 +78,8 @@ def ncov_news(bot: CQHttp, context=None, args: List[str] = None):
     import requests
     import re
     import json
+    import time
+    import datetime
     with requests.get("https://3g.dxy.cn/newh5/view/pneumonia") as urlf:
         soup = bs4.BeautifulSoup(urlf.content.decode("utf-8"), "lxml")
     script = soup.select_one("#getTimelineService")
@@ -77,11 +87,16 @@ def ncov_news(bot: CQHttp, context=None, args: List[str] = None):
 
     data: List[Dict[str, dict]] = json.JSONDecoder().decode(
         expr.search(script.string).groups()[0])
+    statistics = json.JSONDecoder().decode(re.compile(
+        r"= (\{.*\})\}catch").search(soup.select_one("#getStatisticsService").string).groups()[0])
+    update_time: time.struct_time = time.localtime(
+        statistics["modifyTime"]//1000)
     # print(broadcast.text)
     from io import StringIO
     buf = StringIO()
-    buf.write("数据来源: 丁香医生\n")
-    buf.write(str(soup.select_one(".mapTitle___2QtRg").text)+"\n")
+    buf.write(
+        f"数据来源: 丁香医生\n更新于{time.strftime('%Y.%m.%d %H:%M:%S', update_time)}")
+    # buf.write(str(soup.select_one(".mapTitle___2QtRg").text)+"\n")
     buf.write("\n\n")
     for item in data[:5]:
         buf.write(f"""{item["title"]} - {item["infoSource"]} - {item["pubDateStr"]}
