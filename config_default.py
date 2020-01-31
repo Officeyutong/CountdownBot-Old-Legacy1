@@ -16,7 +16,7 @@ CHECK_INTERVAL = 5
 EXECUTE_DELAY = 60
 # 指令前缀
 COMMAND_PREFIX = ["--", "!!"]
-# 指令执行间隔
+# 指令执行间隔 ms
 COMMAND_COOLDOWN = 0
 # 调试模式
 DEBUG = False
