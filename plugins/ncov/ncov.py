@@ -24,7 +24,7 @@ def plugin():
 def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> bytes:
     snapshot.PHANTOMJS_EXEC = config.PHANTOMJS_PATH
     current_map = Map(InitOpts(
-        "400px", "400px",
+        "450px", "400px",
         bg_color="white"
     ))
     max_val = max((x["confirmedCount"] for x in data["cities"]))
