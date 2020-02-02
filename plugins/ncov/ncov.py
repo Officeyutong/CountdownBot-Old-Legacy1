@@ -101,6 +101,7 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
             base64_data = make_province_image(
                 obj, time.strftime('%Y.%m.%d %H:%M:%S', update_time))
             print("Image generated.")
+            print(base64_data[:100])
             bot.send(context, f"[CQ:image,file=base64://{base64_data}]")
         Thread(target=generate_image).start()
 
