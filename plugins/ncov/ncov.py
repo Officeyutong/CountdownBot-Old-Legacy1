@@ -22,7 +22,7 @@ def plugin():
 
 
 def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> bytes:
-    snapshot.PHANTOMJS_EXEC = config.PHANTOMJS_EXEC
+    snapshot.PHANTOMJS_EXEC = config.PHANTOMJS_PATH
     current_map = Map(InitOpts(
         "600px", "600px", bg_color="white"
     ))
