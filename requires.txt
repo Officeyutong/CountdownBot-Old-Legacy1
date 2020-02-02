@@ -1,4 +1,3 @@
-urllib
 cqhttp
 docker
 sympy
