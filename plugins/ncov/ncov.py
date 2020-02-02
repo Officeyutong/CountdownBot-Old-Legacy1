@@ -44,8 +44,9 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     make_snapshot(snapshot, current_map.render(), target_file)
     print(target_file)
     with open(target_file, "rb") as f:
-        base64_data = base64.encodebytes(f.read()).decode()
+        base64_data = base64.encodebytes(f.read()).decode().replace("\n", "")
     os.remove(target_file)
+    os.remove("render.html")
     return base64_data
 
 
