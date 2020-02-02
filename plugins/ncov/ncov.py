@@ -32,6 +32,8 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
         series_name="确诊分布",
         data_pair=[
             (city["cityName"]+"市", city["confirmedCount"]) for city in data["cities"]
+        ]+[
+            (city["cityName"], city["confirmedCount"]) for city in data["cities"]
         ],
         maptype=data["provinceShortName"],
     )
