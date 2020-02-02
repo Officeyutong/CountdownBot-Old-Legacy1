@@ -56,7 +56,7 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     # image.save(buf, "jpg")
     with open(target_file, "rb") as f:
         image_data = f.read()
-    # os.remove(target_file)
+    os.remove(target_file)
     # return buf.getvalue()
     return image_data
 
