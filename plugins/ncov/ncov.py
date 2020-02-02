@@ -24,7 +24,8 @@ def plugin():
 def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> bytes:
     snapshot.PHANTOMJS_EXEC = config.PHANTOMJS_PATH
     current_map = Map(InitOpts(
-        "600px", "600px", bg_color="white"
+        # "600px", "600px",
+        bg_color="white"
     ))
     max_val = max((x["confirmedCount"] for x in data["cities"]))
     current_map.add(
@@ -42,14 +43,14 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     import tempfile
     import base64
     import os
-    target_file = tempfile.mktemp(".png")
+    target_file = tempfile.mktemp(".jpg")
     # import time
-    make_snapshot(snapshot, current_map.render(), target_file)
+    make_snapshot(snapshot, current_map.render(),
+                  target_file, is_remove_html=True)
     print(target_file)
     with open(target_file, "rb") as f:
         image_data = f.read()
     os.remove(target_file)
-    os.remove("render.html")
     return image_data
 
 
