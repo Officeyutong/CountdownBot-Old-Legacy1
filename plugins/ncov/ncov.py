@@ -43,7 +43,7 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     import tempfile
     import base64
     import os
-    target_file = tempfile.mktemp(".jpg")
+    target_file = tempfile.mktemp(".png")
     # import time
     make_snapshot(snapshot, current_map.render(),
                   target_file, is_remove_html=True)
