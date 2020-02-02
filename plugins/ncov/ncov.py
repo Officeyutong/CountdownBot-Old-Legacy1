@@ -47,11 +47,10 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     make_snapshot(snapshot, current_map.render(), target_file)
     print(target_file)
     with open(target_file, "rb") as f:
-        base64_data = base64.encodebytes(f.read()).decode(
-                         "utf-8").replace("\n", "")
+        image_data = f.read()
     os.remove(target_file)
     os.remove("render.html")
-    return base64_data
+    return image_data
 
 
 @command(name="ncov", help="查询2019nCov疫情 | ncov (省名)")
@@ -98,11 +97,16 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
         bot.send(context, buf.getvalue())
 
         def generate_image():
-            base64_data = make_province_image(
+            import base64
+            image_data = make_province_image(
                 obj, time.strftime('%Y.%m.%d %H:%M:%S', update_time))
             print("Image generated.")
-            print(base64_data[:100])
-            bot.send(context, f"[CQ:image,file=base64://{base64_data}]")
+            # print(image_data[:100])
+            # bot.send(context, f"[CQ:image,file=base64://{base64_data}]")
+            bot.send(context, "[CQ:image,file=base64://{}]".format(
+                base64.encodebytes(image_data).decode(
+                    "utf-8").replace("\n", "")
+            ))
         Thread(target=generate_image).start()
 
     def handle_global():
