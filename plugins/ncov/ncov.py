@@ -10,6 +10,8 @@ from pyecharts.render import make_snapshot
 from snapshot_phantomjs import snapshot
 from threading import Thread
 
+config = global_vars.CONFIG[__name__]
+
 
 def plugin():
     return {
@@ -20,6 +22,7 @@ def plugin():
 
 
 def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> bytes:
+    snapshot.PHANTOMJS_EXEC = config.PHANTOMJS_EXEC
     current_map = Map(InitOpts(
         "600px", "600px", bg_color="white"
     ))
