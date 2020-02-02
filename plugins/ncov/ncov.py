@@ -9,7 +9,7 @@ from pyecharts.render import make_snapshot
 # from selenium import webdriver
 from snapshot_phantomjs import snapshot
 from threading import Thread
-
+import global_vars
 config = global_vars.CONFIG[__name__]
 
 
