@@ -48,10 +48,16 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     make_snapshot(snapshot, current_map.render(),
                   target_file, is_remove_html=True)
     print(target_file)
-    with open(target_file, "rb") as f:
-        image_data = f.read()
-    os.remove(target_file)
-    return image_data
+    from PIL import Image
+    image = Image.open(target_file)
+    from io import BytesIO
+    buf = BytesIO()
+    # 转换为jpg图片
+    image.save(buf, "jpg")
+    # with open(target_file, "rb") as f:
+    #     image_data = f.read()
+    # os.remove(target_file)
+    return buf.getvalue()
 
 
 @command(name="ncov", help="查询2019nCov疫情 | ncov (省名)")
