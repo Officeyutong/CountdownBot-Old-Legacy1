@@ -1,6 +1,14 @@
 from register import command
 from cqhttp import CQHttp
-from typing import List, Dict
+from typing import List, Dict, Union
+
+from pyecharts.charts import Map
+from pyecharts.options import InitOpts, VisualMapOpts, TitleOpts
+from pyecharts.render import make_snapshot
+# from snapshot_selenium import snapshot
+# from selenium import webdriver
+from snapshot_phantomjs import snapshot
+from threading import Thread
 
 
 def plugin():
@@ -9,6 +17,36 @@ def plugin():
         "version": 1.0,
         "description": "丁香园2019nCov疫情播报"
     }
+
+
+def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> bytes:
+    current_map = Map(InitOpts(
+        "600px", "600px", bg_color="white"
+    ))
+    max_val = max((x["confirmedCount"] for x in data["cities"]))
+    current_map.add(
+        series_name="确诊分布",
+        data_pair=[
+            (city["cityName"]+"市", city["confirmedCount"]) for city in data["cities"]
+        ],
+        maptype=data["provinceShortName"],
+    )
+    current_map.set_global_opts(
+        visualmap_opts=VisualMapOpts(max_=max_val, is_piecewise=True),
+        title_opts=TitleOpts(title=f"{data['provinceName']}确诊病例分布图",
+                             subtitle=f"截止{update_time},本省已有 {data['confirmedCount']} 人确诊, {data['curedCount']} 人治愈, {data['deadCount']} 人死亡")
+    )
+    import tempfile
+    import base64
+    import os
+    target_file = tempfile.mktemp(".png")
+    # import time
+    make_snapshot(snapshot, current_map.render(), target_file)
+    print(target_file)
+    with open(target_file, "rb") as f:
+        base64_data = base64.encodebytes(f.read()).decode()
+    os.remove(target_file)
+    return base64_data
 
 
 @command(name="ncov", help="查询2019nCov疫情 | ncov (省名)")
@@ -53,6 +91,13 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
         for city in obj["cities"]:
             buf.write(generate_line(city)+"\n")
         bot.send(context, buf.getvalue())
+
+        def generate_image():
+            base64_data = make_province_image(
+                obj, time.strftime('%Y.%m.%d %H:%M:%S', update_time))
+            print("Image generated.")
+            bot.send(context, f"[CQ:image,file=base64://{base64_data}]")
+        Thread(target=generate_image).start()
 
     def handle_global():
         for item in data:
