@@ -194,7 +194,7 @@ def plot(bot: CQHttp, context: dict, args: List[str]) -> None:
                 import matplotlib.pyplot as plt
                 from io import BytesIO
 
-                x = numpy.arange(begin, end, 0.01)
+                x = numpy.arange(begin, end, (end-begin)/1000)
                 print(begin, end)
                 buf = BytesIO()
                 plt.cla()
@@ -250,7 +250,7 @@ def plotpe(bot: CQHttp, context: dict, args: List[str]) -> None:
                 import matplotlib.pyplot as plt
                 from io import BytesIO
 
-                ts = np.arange(begin, end, 0.01)
+                ts = np.arange(begin, end, (end-begin)/1000)
                 print(begin, end)
                 buf = BytesIO()
                 plt.cla()
