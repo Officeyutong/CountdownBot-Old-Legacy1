@@ -38,7 +38,7 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
         maptype=data["provinceShortName"],
     )
     current_map.set_global_opts(
-        visualmap_opts=VisualMapOpts(max_=max_val, is_piecewise=True),
+        visualmap_opts=VisualMapOpts(max_=max_val, is_piecewise=False),
         title_opts=TitleOpts(title=f"{data['provinceName']}确诊病例分布图",
                              subtitle=f"截止{update_time},本省已有 {data['confirmedCount']} 人确诊, {data['curedCount']} 人治愈, {data['deadCount']} 人死亡")
     )
@@ -46,20 +46,12 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     import base64
     import os
     target_file = tempfile.mktemp(".png")
-    # import time
     make_snapshot(snapshot, current_map.render(),
                   target_file, is_remove_html=True, pixel_ratio=1)
     print(target_file)
-    # from PIL import Image
-    # image = Image.open(target_file)
-    # from io import BytesIO
-    # buf = BytesIO()
-    # 转换为jpg图片
-    # image.save(buf, "jpg")
     with open(target_file, "rb") as f:
         image_data = f.read()
     os.remove(target_file)
-    # return buf.getvalue()
     return image_data
 
 
