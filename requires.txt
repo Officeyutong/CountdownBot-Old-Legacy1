@@ -16,3 +16,4 @@ echarts-cities-pypkg
 echarts-china-cities-pypkg
 echarts-china-provinces-pypkg
 pillow
+pydub

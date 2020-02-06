@@ -29,7 +29,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
             bpm = int(note[note.index(":")+1:])
             continue
         try:
-            note_name, duration = note.split(".")
+            note_name, duration = note.split(".", 1)
             notes.append((
                 note_name, int(duration)
             ))
@@ -69,7 +69,7 @@ def genhelp(bot: CQHttp, context: dict, *args):
     使用方式:
     gen [bpm:BPM(可选,用于指定BPM数,默认为{config.DEFAULT_BPM})] [音符1] [音符2]....
     其中音符的格式如下:
-    [音符名(a-g,r表示休止符)][#或b(可选)][八度(可选,默认为4)][*(可选,表示重音)].[时长(即多少拍,正整数表示拍数,负整数表示附点音符)]
+    [音符名(a-g,r表示休止符)][#或b(可选)][八度(可选,默认为4)][*(可选,表示重音)].[节拍,x表示x分音符]
     例如以下均为合法音符
     c.1   --- 普通的音符C,一拍
     c*.2  --- 普通的音符C,重音,两拍
