@@ -17,3 +17,4 @@ echarts-china-cities-pypkg
 echarts-china-provinces-pypkg
 pillow
 pydub
+sox
