@@ -40,13 +40,14 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
                 continue
             try:
                 note_name, duration = note.split(".", 1)
-                if float(duration) < 1:
-                    raise ValueError("Duration >= 1")
+                if abs(float(duration)) < 1:
+                    raise ValueError("abs(Duration) >= 1")
                 notes.append((
                     note_name, float(duration)
                 ))
             except Exception as ex:
                 bot.send(context, f"存在非法音符: {note}\n{ex}")
+                raise ValueError(f"存在非法音符: {note}\n{ex}")
                 return
         return notes
     string = " ".join(args[1:])
