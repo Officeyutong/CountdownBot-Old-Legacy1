@@ -120,4 +120,11 @@ def genhelp(bot: CQHttp, context: dict, *args):
     c#5*.2 --- 音符C,升调,高一个八度,重音,两拍
     c.-2 --- 音符C,二分附点
     以下为部分合法的指令调用:
-    gen bpm:130 c.1 d.1 e.1 f.1 g.1 a.1 b.1""")
+    gen bpm:130 c.1 d.1 e.1 f.1 g.1 a.1 b.1
+    
+    以下内容来自PySynth文档:
+    # Dotted notes can be written in two ways:
+    # 1.33 = -2 = dotted half
+    # 2.66 = -4 = dotted quarter
+    # 5.33 = -8 = dotted eighth
+    """)
