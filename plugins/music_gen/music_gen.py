@@ -51,7 +51,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
         return notes
     string = " ".join(args[1:])
 
-    for track_string in string.split("\n"):
+    for track_string in string.split("|"):
         track_string = track_string.strip()
 
         if track_string:
@@ -100,10 +100,9 @@ def genhelp(bot: CQHttp, context: dict, *args):
     bot.send(context, f"""本功能基于PySynth，通过numpy输出wav的方式生成音频流。
 
     使用方式:
-    gen [bpm:BPM(可选,用于指定BPM数,默认为{config.DEFAULT_BPM})] [音轨1:音符1] [音轨1:音符2]....
-    [音轨2:音符1] [音轨2:音符2...]
+    gen [bpm:BPM(可选,用于指定BPM数,默认为{config.DEFAULT_BPM})] [音轨1:音符1] [音轨1:音符2]....| [音轨2:音符1] [音轨2:音符2...]
 
-    其中以换行分割不同音轨
+    其中以|分割不同音轨
     其中音符的格式如下:
     [音符名(a-g,r表示休止符)][#或b(可选)][八度(可选,默认为4)][*(可选,表示重音)].[节拍,x表示x分音符]
     例如以下均为合法音符
