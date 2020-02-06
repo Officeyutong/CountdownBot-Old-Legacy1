@@ -42,8 +42,8 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
                 continue
             try:
                 note_name, duration = note.split(".", 1)
-                if abs(float(duration)) < 1:
-                    raise ValueError("abs(Duration) >= 1")
+                # if abs(float(duration)) < 1:
+                #     raise ValueError("abs(Duration) >= 1")
                 notes.append((
                     note_name, float(duration)
                 ))
