@@ -48,7 +48,6 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
             except Exception as ex:
                 bot.send(context, f"存在非法音符: {note}\n{ex}")
                 raise ValueError(f"存在非法音符: {note}\n{ex}")
-                return
         return notes
     string = " ".join(args[1:])
 
