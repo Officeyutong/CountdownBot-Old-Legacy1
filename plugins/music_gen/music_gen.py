@@ -22,6 +22,8 @@ plugin = dataclass_wrapper(lambda: PluginMeta(
 ))
 
 
+# @command(name="gencomp",help="将简谱")
+
 @command(name="gen", help="生成音乐 | 帮助请使用 genhelp 指令查看")
 def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
     tracks: List[List[Tuple[str, int]]] = []
@@ -109,7 +111,7 @@ def genhelp(bot: CQHttp, context: dict, *args):
 
     其中以|分割不同音轨
     其中音符的格式如下:
-    [音符名(a-g,r表示休止符)][#或b(可选,#为升调,b为降调)][八度(可选,默认为4)][*(可选,表示重音)].[节拍,x表示x分音符]
+    [音符名(a-g,r表示休止符)][#或b(可选,#为升调,b为降调)][八度(可选,默认为4)][*(可选,表示重音)].[节拍,x表示x分音符,-x表示x分附点]
     例如以下均为合法音符
     c.1   --- 普通的音符C,一拍
     c*.2  --- 普通的音符C,重音,两拍
