@@ -69,11 +69,15 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
         track_files: List[str] = []
         combiner = sox.Combiner()
         bot.send(context, f"生成中...共计{len(tracks)}个音轨")
-        for track in tracks:
+        for i, track in enumerate(tracks):
             track_file = tempfile.mktemp(".wav")
-            make_wav(
-                track, bpm, fn=track_file, silent=True
-            )
+            try:
+                make_wav(
+                    track, bpm, fn=track_file, silent=True
+                )
+            except Exception as ex:
+                bot.send(context, f"音轨{i+1}出现错误: {ex}")
+                raise ex
             track_files.append(track_file)
         print(track_files)
         if len(track_files) == 1:
