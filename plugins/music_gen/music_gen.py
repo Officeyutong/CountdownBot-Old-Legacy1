@@ -162,7 +162,9 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
         if track_string:
             print("track:"+track_string)
             tracks.append(process_track(track_string))
-    print(tracks)
+    # print(tracks)
+    for i, track in enumerate(tracks):
+        print(f"音轨 {i+1} 长度 {len(track)}")
     notes_count = sum((len(x) for x in tracks))
     if notes_count > config.MAX_NOTES:
         bot.send(context, "超出音符数上限")
@@ -185,6 +187,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
                 raise ex
             track_files.append(track_file)
         print(track_files)
+
         if len(track_files) == 1:
             wav_output = track_files[0]
         else:
