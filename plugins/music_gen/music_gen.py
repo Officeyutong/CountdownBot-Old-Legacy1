@@ -80,6 +80,9 @@ def transform_single_note(note: str, major_height: int) -> str:
     NOTE_LIST = ["c", "c#", "d", "d#", "e",
                  "f", "f#", "g", "g#", "a", "a#", "b"]
     # print("transforming ", note)
+    # 特殊的用以标记的音符不处理
+    if "." not in note:
+        return note
     note, duration = note.split(".", 1)
     starred = note[-1] == '*'
     if starred:
@@ -213,6 +216,8 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
                 raise ValueError(f"存在非法音符: {note}\n{ex}")
         return notes
     string = note_string
+    inversed = "inverse" in string
+    string = string.replace("inverse", "")
 
     for track_string in string.split("|"):
         track_string = track_string.strip()
@@ -220,7 +225,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
         if track_string:
             # print("track:"+track_string)
             tracks.append(process_track(
-                track_string, "inverse" in track_string))
+                track_string, inversed))
     # print(tracks)
     for i, track in enumerate(tracks):
         print(f"音轨 {i+1} 长度 {len(track)}")
