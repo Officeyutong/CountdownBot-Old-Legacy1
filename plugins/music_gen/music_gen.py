@@ -219,13 +219,27 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
     # inversed4 = "inverse4" in string
     inversed = "inverse" in string
     string = string.replace("inverse", "")
+    import re
     if "beats" in string:
-        import re
+
         expr = re.compile(r"beats:([0-9]{1,2})")
         beats = expr.search(string).groups()[0]
         string = string.replace(f"beats:{beats}", "")
     else:
         beats = 4
+    track_count = string.count("|")+1
+    if "volume:" in string:
+        volume = [int(x) for x in re.compile(
+            r"volume:([^ ])").search(string).groups()[0].split(",")]
+        if len(volume) != track_count:
+            if len(volume) == 1:
+                volume = [volume[0] for i in range(track_count)]
+    else:
+        volume = [config.DEFAULT_VOLUME for i in range(track_count)]
+    if len(volume) != track_count:
+        updater("音量个数需要与音轨个数相等.")
+        return
+    print(volume)
     for track_string in string.split("|"):
         track_string = track_string.strip()
         if track_string:
@@ -262,8 +276,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
             wav_output = track_files[0]
         else:
             wav_output = tempfile.mktemp(".wav")
-            combiner.build(track_files, wav_output, "merge", [
-                           1 for i in range(len(track_files))])
+            combiner.build(track_files, wav_output, "merge", volume)
         song = AudioSegment.from_wav(wav_output)
         song.export(mp3_output)
         with open(mp3_output, "rb") as f:
@@ -340,8 +353,13 @@ def genhelp(bot: CQHttp, context: dict, *args):
     使用此方式时,除了from:参数外,其他参数均会被忽略
 
     特殊参数:
+    inverse 与 beats
     当乐谱中出现inverse参数时,节拍x表示的意义将会变成"这个音占y分音符的比例",其中y通过另一个参数beats指定,默认为4
     例如以下调用
     convert-play major:F bpm:120 inverse beats:3 1.1 2.1 3.1
     将会生成三个三分音符
+    volume:
+    此参数用于指定多个音轨的音量,有以下两种使用方式
+    volume:x --- 指定所有音轨的音量均为x,默认为{config.DEFAULT_VOLUME}
+    volume:a,b,c... --- 依次指定各个音轨的音量,音量个数需要与音轨个数相等
     """)
