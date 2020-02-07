@@ -100,6 +100,7 @@ def transform_notes(notes: List[str], major: str):
     major_height = parse_major(major)
     result = []
     for note in notes:
+
         if "r" not in note:
             if note.strip():
                 result.append(transform_single_note(
@@ -186,7 +187,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
     tracks: List[List[Tuple[str, int]]] = []
     bpm = config.DEFAULT_BPM
 
-    def process_track(string: str):
+    def process_track(string: str, inversed_duration: bool):
         notes: List[Tuple[str, int]] = []
         # print(f"Processing track '{string}'")
         for note_ in string.split(" "):
@@ -199,6 +200,8 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
                 continue
             try:
                 note_name, duration = note.split(".", 1)
+                if inversed_duration:
+                    duration = 1/duration
                 if abs(float(duration)) < 0.1:
                     raise ValueError("abs(Duration) >= 0.1")
                 notes.append((
@@ -215,7 +218,8 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
 
         if track_string:
             # print("track:"+track_string)
-            tracks.append(process_track(track_string))
+            tracks.append(process_track(
+                track_string, "inverse" in track_string))
     # print(tracks)
     for i, track in enumerate(tracks):
         print(f"音轨 {i+1} 长度 {len(track)}")

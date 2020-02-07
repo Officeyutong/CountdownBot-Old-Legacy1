@@ -34,7 +34,6 @@ import wave
 import struct
 import numpy as np
 from math import sin, cos, pi, log, exp
-from mixfiles import mix_files
 # from demosongs import *
 from mkfreq import getfreq
 
