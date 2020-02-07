@@ -205,7 +205,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
             try:
                 note_name, duration = note.split(".", 1)
                 if inversed_duration:
-                    duration = 1/duration
+                    duration = 1/float(duration)
                 if abs(float(duration)) < 0.1:
                     raise ValueError("abs(Duration) >= 0.1")
                 notes.append((
