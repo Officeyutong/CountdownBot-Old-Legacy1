@@ -3,7 +3,7 @@ from common.plugin import dataclass_wrapper
 
 from register import command
 from global_vars import CONFIG
-from pysynth_b import make_wav, mix_files
+from .pysynth_b import make_wav, mix_files
 from cqhttp import CQHttp
 from typing import List, Tuple
 from pydub import AudioSegment
