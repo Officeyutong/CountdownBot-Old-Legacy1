@@ -36,7 +36,6 @@ import numpy as np
 from math import sin, cos, pi, log, exp
 # from demosongs import *
 from mkfreq import getfreq
-
 pitchhz, keynum = getfreq()
 
 # Harmonic intensities (dB) for selected piano keys,
