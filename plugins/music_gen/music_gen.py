@@ -229,8 +229,10 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
         beats = 4
     track_count = string.count("|")+1
     if "volume:" in string:
-        volume = [int(x) for x in re.compile(
-            r"volume:([^ ])").search(string).groups()[0].split(",")]
+        matched = re.compile(
+            r"volume:([^ ]+)").search(string).groups()[0]
+        volume = [int(x) for x in matched.split(",")]
+        string = string.replace(f"volume:{matched}")
         if len(volume) != track_count:
             if len(volume) == 1:
                 volume = [volume[0] for i in range(track_count)]
@@ -240,6 +242,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
         updater("音量个数需要与音轨个数相等.")
         return
     print(volume)
+
     for track_string in string.split("|"):
         track_string = track_string.strip()
         if track_string:
