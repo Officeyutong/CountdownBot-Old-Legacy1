@@ -191,7 +191,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
     tracks: List[List[Tuple[str, int]]] = []
     bpm = config.DEFAULT_BPM
 
-    def process_track(string: str, inversed_duration: bool):
+    def process_track(string: str, inversed_duration: bool, beats: int):
         notes: List[Tuple[str, int]] = []
         # print(f"Processing track '{string}'")
         for note_ in string.split(" "):
@@ -205,7 +205,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
             try:
                 note_name, duration = note.split(".", 1)
                 if inversed_duration:
-                    duration = 1/float(duration)
+                    duration = beats/(float(duration))
                 if abs(float(duration)) < 0.1:
                     raise ValueError("abs(Duration) >= 0.1")
                 notes.append((
@@ -216,16 +216,22 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
                 raise ValueError(f"存在非法音符: {note}\n{ex}")
         return notes
     string = note_string
+    # inversed4 = "inverse4" in string
     inversed = "inverse" in string
     string = string.replace("inverse", "")
-
+    if "beats" in string:
+        import re
+        expr = re.compile(r"beats:([0-9]{1,2})")
+        beats = expr.search(string).groups()[0]
+        string = string.replace(f"beats:{beats}", "")
+    else:
+        beats = 4
     for track_string in string.split("|"):
         track_string = track_string.strip()
-
         if track_string:
             # print("track:"+track_string)
             tracks.append(process_track(
-                track_string, inversed))
+                track_string, inversed, int(beats)))
     # print(tracks)
     for i, track in enumerate(tracks):
         print(f"音轨 {i+1} 长度 {len(track)}")
@@ -292,11 +298,11 @@ def genhelp(bot: CQHttp, context: dict, *args):
     bot.send(context, f"""本功能基于PySynth，通过numpy输出wav的方式生成音频流。
 
     使用方式:
-    gen [bpm:BPM(可选,用于指定BPM数,默认为{config.DEFAULT_BPM})] [音轨1:音符1] [音轨1:音符2]....| [音轨2:音符1] [音轨2:音符2...]
+    gen [bpm:BPM(可选,用于指定BPM数(每分钟播放的四分音符的个数),默认为{config.DEFAULT_BPM})] [音轨1:音符1] [音轨1:音符2]....| [音轨2:音符1] [音轨2:音符2...]
 
     其中以|分割不同音轨
     其中音符的格式如下:
-    [音符名(a-g,r表示休止符)][#或b(可选,#为升调,b为降调)][八度(可选,默认为4)][*(可选,表示重音)].[节拍,x表示x分音符,-x表示x分附点]
+    [音符名(a-g,r表示休止符)][#或b(可选,#为升调,b为降调)][八度(可选,默认为4)][*(可选,表示重音)].[节拍,x表示x分音符或该音符占y分音符之比(见下文),-x表示x分附点]
     例如以下均为合法音符
     c.1   --- 普通的音符C,四拍
     c*.2  --- 普通的音符C,重音,两拍
@@ -331,4 +337,10 @@ def genhelp(bot: CQHttp, context: dict, *args):
     使用gen,noteconvert,convert-play指令时,使用from:url来指定UbuntuPastebin的URL,比如:
     convert-play from:https://pastebin.ubuntu.com/p/xxxxxxxx/
     使用此方式时,除了from:参数外,其他参数均会被忽略
+
+    特殊参数:
+    当乐谱中出现inverse参数时,节拍x表示的意义将会变成"这个音占y分音符的比例",其中y通过另一个参数beats指定,默认为4
+    例如以下调用
+    convert-play major:F bpm:120 inverse beats:3 1.1 2.1 3.1
+    将会生成三个三分音符
     """)
