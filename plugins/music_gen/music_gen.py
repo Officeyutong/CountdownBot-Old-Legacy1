@@ -160,7 +160,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
         track_string = track_string.strip()
 
         if track_string:
-            print("track:"+track_string)
+            # print("track:"+track_string)
             tracks.append(process_track(track_string))
     # print(tracks)
     for i, track in enumerate(tracks):
