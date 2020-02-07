@@ -163,8 +163,8 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
             print("track:"+track_string)
             tracks.append(process_track(track_string))
     print(tracks)
-
-    if sum((len(x) for x in tracks)) > config.MAX_NOTES:
+    notes_count = sum((len(x) for x in tracks))
+    if notes_count > config.MAX_NOTES:
         bot.send(context, "超出音符数上限")
         return
 
@@ -173,7 +173,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
     def process():
         track_files: List[str] = []
         combiner = sox.Combiner()
-        bot.send(context, f"生成中...共计{len(tracks)}个音轨")
+        bot.send(context, f"生成中...共计{len(tracks)}个音轨,{notes_count}个音符")
         for i, track in enumerate(tracks):
             track_file = tempfile.mktemp(".wav")
             try:
