@@ -134,7 +134,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
 
     def process_track(string: str):
         notes: List[Tuple[str, int]] = []
-        print(f"Processing track '{string}'")
+        # print(f"Processing track '{string}'")
         for note_ in string.split(" "):
             note = note_.strip()
             if not note:
