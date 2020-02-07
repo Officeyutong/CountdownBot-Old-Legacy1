@@ -69,7 +69,7 @@ def parse_note(note: str) -> int:
 def transform_single_note(note: str, major_height: int) -> str:
     NOTE_LIST = ["c", "c#", "d", "d#", "e",
                  "f", "f#", "g", "g#", "a", "a#", "b"]
-
+    # print("transforming ", note)
     note, duration = note.split(".", 1)
     starred = note[-1] == '*'
     if starred:
@@ -92,7 +92,9 @@ def transform_notes(notes: List[str], major: str):
     result = []
     for note in notes:
         if "r" not in note:
-            result.append(transform_single_note(note, major_height))
+            if note.strip():
+                result.append(transform_single_note(
+                    note.strip(), major_height))
         else:
             result.append(note)
     return result
@@ -110,10 +112,12 @@ def noteconvert(bot: CQHttp, context: dict, args: List[str] = None):
             for note in track.split(" "):
                 note = note.strip()
                 if note:
+                    # print(note)
                     if note.startswith('major:'):
                         major = note[note.index(":")+1:]
                     else:
                         filtered.append(note)
+            # print(tracks)
             tracks.append(transform_notes(filtered, major))
         from io import StringIO
         buf = StringIO()
