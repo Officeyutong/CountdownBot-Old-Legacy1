@@ -5,13 +5,15 @@ from register import command
 from global_vars import CONFIG
 from .pysynth_b import make_wav, mix_files
 from cqhttp import CQHttp
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 from pydub import AudioSegment
 import base64
 import threading
 import tempfile
 import os
 import sox
+import requests
+import bs4
 # import numpy as np
 # import wave
 config = CONFIG.get(__name__, None)
@@ -20,6 +22,13 @@ plugin = dataclass_wrapper(lambda: PluginMeta(
     version=1.0,
     description="生成音乐"
 ))
+
+
+def load_from_ubntupastebin(url: str) -> str:
+    with requests.get(url) as urlf:
+        soup = bs4.BeautifulSoup(urlf.text, "lxml")
+    code_pre = soup.select_one(".code > .paste > pre")
+    return str(list(code_pre.children)[1])
 
 
 def parse_major(major_note: str) -> int:
@@ -100,14 +109,11 @@ def transform_notes(notes: List[str], major: str):
     return result
 
 
-@command(name="noteconvert", help="转换简谱 | 使用genhelp指令查看帮助")
-def noteconvert(bot: CQHttp, context: dict, args: List[str] = None):
-    args = args[1:]
+def noteconvert(note_string: str, update_status: Callable[[str], None], finish_callback: Callable[[str], None]):
     major = "C"
-
     try:
         tracks: List[List[str]] = []
-        for track in " ".join(args).split("|"):
+        for track in note_string.split("|"):
             filtered = []
             for note in track.split(" "):
                 note = note.strip()
@@ -125,14 +131,58 @@ def noteconvert(bot: CQHttp, context: dict, args: List[str] = None):
             buf.write(" ".join(track))
             if i != len(tracks)-1:
                 buf.write("| \n")
-        bot.send(context, buf.getvalue())
+        finish_callback(buf.getvalue())
 
     except Exception as ex:
-        bot.send(context, f"发生错误: {ex}")
+        # bot.send(context, f"发生错误: {ex}")
+        update_status(f"发生错误: {ex}")
 
 
-@command(name="gen", help="生成音乐 | 帮助请使用 genhelp 指令查看")
-def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
+@command(name="convert-play", help="转换简谱并播放 | 使用genhelp指令查看帮助")
+def convert_play(bot: CQHttp, context: dict, args: List[str]):
+    def callback(x): bot.send(context, x)
+    filtered: List[str] = []
+    for item in " ".join(args[1:]).split():
+        item = item.strip()
+        if item.startswith("from:"):
+            url = item[item.index(":")+1:]
+            filtered = load_from_ubntupastebin(url).split()
+            break
+        else:
+            filtered.append(item)
+    major = "C"
+    bpm = config.DEFAULT_BPM
+    for item in filtered:
+        if item.startswith("major:"):
+            major = item[item.index(":")+1:]
+        elif item.startswith("bpm:"):
+            bpm = int(item[item.index(":")+1:])
+    note_string = " ".join(
+        (x for x in filtered if not x.startswith("major") and not x.startswith("bpm")))
+    noteconvert(
+        f"major:{major} "+note_string,
+        callback,
+        lambda result: generate_music(f"bpm:{bpm} "+result, callback, callback)
+    )
+
+
+@command(name="noteconvert", help="转换简谱 | 使用genhelp指令查看帮助")
+def noteconvert_command(bot: CQHttp, context: dict, args: List[str] = None):
+    def callback(x): return bot.send(context, x)
+    # noteconvert(" ".join(args[1:]), callback, callback)
+    filtered: List[str] = []
+    for item in " ".join(args[1:]).split():
+        item = item.strip()
+        if item.startswith("from:"):
+            url = item[item.index(":")+1:]
+            noteconvert(load_from_ubntupastebin(url), callback, callback)
+            return
+        else:
+            filtered.append(item)
+    noteconvert(" ".join(filtered), callback, callback)
+
+
+def generate_music(note_string: str, updater: Callable[[str], None], callback: Callable[[str], None]):
     tracks: List[List[Tuple[str, int]]] = []
     bpm = config.DEFAULT_BPM
 
@@ -155,10 +205,10 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
                     note_name, float(duration)
                 ))
             except Exception as ex:
-                bot.send(context, f"存在非法音符: {note}\n{ex}")
+                updater(f"存在非法音符: {note}\n{ex}")
                 raise ValueError(f"存在非法音符: {note}\n{ex}")
         return notes
-    string = " ".join(args[1:])
+    string = note_string
 
     for track_string in string.split("|"):
         track_string = track_string.strip()
@@ -171,7 +221,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
         print(f"音轨 {i+1} 长度 {len(track)}")
     notes_count = sum((len(x) for x in tracks))
     if notes_count > config.MAX_NOTES:
-        bot.send(context, "超出音符数上限")
+        updater("超出音符数上限")
         return
 
     mp3_output = tempfile.mktemp(".mp3")
@@ -179,7 +229,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
     def process():
         track_files: List[str] = []
         combiner = sox.Combiner()
-        bot.send(context, f"生成中...共计{len(tracks)}个音轨,{notes_count}个音符")
+        updater(f"生成中...共计{len(tracks)}个音轨,{notes_count}个音符")
         for i, track in enumerate(tracks):
             track_file = tempfile.mktemp(".wav")
             try:
@@ -187,7 +237,7 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
                     track, bpm, fn=track_file, silent=True
                 )
             except Exception as ex:
-                bot.send(context, f"音轨{i+1}出现错误: {ex}")
+                updater(f"音轨{i+1}出现错误: {ex}")
                 raise ex
             track_files.append(track_file)
         print(track_files)
@@ -208,8 +258,23 @@ def generate_music(bot: CQHttp, context: dict, args: List[str] = None):
         for file in track_files:
             if os.path.exists(file):
                 os.remove(file)
-        bot.send(context, base64_data)
+        callback(base64_data)
     threading.Thread(target=process).start()
+
+
+@command(name="gen", help="生成音乐 | 帮助请使用 genhelp 指令查看")
+def generate_music_command(bot: CQHttp, context: dict, args: List[str] = None):
+    def callback(msg): return bot.send(context, msg)
+    filtered: List[str] = []
+    for item in " ".join(args[1:]).split():
+        item = item.strip()
+        if item.startswith("from:"):
+            url = item[item.index(":")+1:]
+            generate_music(load_from_ubntupastebin(url), callback, callback)
+            return
+        else:
+            filtered.append(item)
+    generate_music(" ".join(filtered), callback, callback)
 
 
 @command(name="genhelp", help="查看音乐生成器帮助")
@@ -246,4 +311,14 @@ def genhelp(bot: CQHttp, context: dict, *args):
     其中节拍参考PySynth谱部分
     以下为合法的指令调用:
     noteconvert major:bB 5.4 3.4 2.4 1.4 2.8 1.8 2.4 5.-4 r.8 5.4 3.4 2.4 1.4 2.8 1.8 5.4 3.-4 r.8
+    
+    关于简谱转换并播放:
+    基本与noteconvert指令相同,但可以使用bpm:指定BPM
+
+    关于从UbuntuPastebin下载:
+    由于QQ的限制,单条消息长度不能超过4.5K，故本插件的gen,noteconvert,convert-play指令均支持从UbuntuPastebin下载数据.
+    使用方式:
+    使用gen,noteconvert,convert-play指令时,使用from:url来指定UbuntuPastebin的URL,比如:
+    convert-play from:https://pastebin.ubuntu.com/p/xxxxxxxx/
+    使用此方式时,除了from:参数外,其他参数均会被忽略
     """)
