@@ -102,18 +102,29 @@ def transform_notes(notes: List[str], major: str):
 def noteconvert(bot: CQHttp, context: dict, args: List[str] = None):
     args = args[1:]
     major = "C"
-    filtered = []
+
     try:
-        for note in args:
-            note = note.strip()
-            if note:
-                if note.startswith('major:'):
-                    major = note[note.index(":")+1:]
-                else:
-                    filtered.append(note)
-        bot.send(context, " ".join(transform_notes(filtered, major)))
+        tracks: List[List[str]] = []
+        for track in " ".join(args).split("|"):
+            filtered = []
+            for note in track.split(" "):
+                note = note.strip()
+                if note:
+                    if note.startswith('major:'):
+                        major = note[note.index(":")+1:]
+                    else:
+                        filtered.append(note)
+            tracks.append(transform_notes(filtered, major))
+        from io import StringIO
+        buf = StringIO()
+        for i, track in enumerate(tracks):
+            buf.write(" ".join(track))
+            if i != len(tracks)-1:
+                buf.write("| \n")
+        bot.send(context, buf.getvalue())
+
     except Exception as ex:
-        bot.send(f"发生错误: {ex}")
+        bot.send(context, f"发生错误: {ex}")
 
 
 @command(name="gen", help="生成音乐 | 帮助请使用 genhelp 指令查看")
@@ -214,7 +225,6 @@ def genhelp(bot: CQHttp, context: dict, *args):
     以下为部分合法的指令调用:
     gen bpm:130 c.1 d.1 e.1 f.1 g.1 a.1 b.1
     
-    以下内容来自PySynth文档:
     # Dotted notes can be written in two ways:
     # 1.33 = -2 = dotted half
     # 2.66 = -4 = dotted quarter
@@ -223,9 +233,9 @@ def genhelp(bot: CQHttp, context: dict, *args):
     关于简谱转换:
     可以使用notecover指令从简谱转换谱子到PySynth的格式
     其使用方式为
-    noteconvert [major:大调,可选,例如#G,A,C,默认为C] [简谱音符1] [简谱音符2]...
+    noteconvert [major:大调,可选,例如#G,A,C,默认为C] [简谱音符1] [简谱音符2]... | [音轨2...]
     其中简谱音符的格式为:
-    [音符,1...7][#或b或留空(表示升调或降调)][八度(可空,默认为4)][*,重音符号,可空].[节拍]
+    [#或b或留空(表示升调或降调)][音符,1...7或r,其中r表示休止符][八度(可空,默认为4)][*,重音符号,可空].[节拍]
     其中节拍参考PySynth谱部分
     以下为合法的指令调用:
     noteconvert major:bB 5.4 3.4 2.4 1.4 2.8 1.8 2.4 5.-4 r.8 5.4 3.4 2.4 1.4 2.8 1.8 5.4 3.-4 r.8
