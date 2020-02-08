@@ -279,7 +279,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
             wav_output = track_files[0]
         else:
             wav_output = tempfile.mktemp(".wav")
-            combiner.build(track_files, wav_output, "merge", volume)
+            combiner.build(track_files, wav_output, "mix-power", volume)
         song = AudioSegment.from_wav(wav_output)
         song.export(mp3_output)
         with open(mp3_output, "rb") as f:
