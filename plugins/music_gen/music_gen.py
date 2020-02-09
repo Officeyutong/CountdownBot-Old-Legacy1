@@ -194,7 +194,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
     def process_track(string: str, inversed_duration: bool, beats: int):
         notes: List[Tuple[str, int]] = []
         # print(f"Processing track '{string}'")
-        for note_ in string.split(" "):
+        for note_ in string.split():
             note = note_.strip()
             if not note:
                 continue
