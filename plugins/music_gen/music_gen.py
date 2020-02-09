@@ -230,7 +230,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
     track_count = string.count("|")+1
     if "volume:" in string:
         matched = re.compile(
-            r"volume:([^ ]+)").search(string).groups()[0]
+            r"volume:([,0-9]+)").search(string).groups()[0]
         volume = [int(x) for x in matched.split(",")]
         string = string.replace(f"volume:{matched}", "")
         if len(volume) != track_count:
