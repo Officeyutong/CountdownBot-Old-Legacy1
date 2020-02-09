@@ -29,6 +29,10 @@ def where_is(bot: CQHttp, context: dict, args: List[str]):
             bot.send(context, result["info"])
             return
         # print(result["pois"])
+        if len(result["pois"]) == 0:
+            bot.send(context, "搜索无结果")
+            return
+        
         target = (result["pois"][0])
         lon, lat = target["location"].split(",")
         bot.send(
@@ -54,6 +58,9 @@ def where_id(bot: CQHttp, context: dict, args: List[str]):
             bot.send(context, result["info"])
             return
         # print(result["pois"])
+        if len(result["pois"]) == 0:
+            bot.send(context, "搜索无结果")
+            return
         target = (result["pois"][0])
         lon, lat = target["location"].split(",")
         bot.send(
