@@ -55,7 +55,7 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     return image_data
 
 
-@command(name="ncov", help="查询2019nCov疫情 | ncov (省名)")
+@command(name="covid19", help="查询2019nCov疫情 | ncov (省名)")
 def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
     import bs4
     import requests
