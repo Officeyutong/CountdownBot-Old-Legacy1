@@ -42,7 +42,8 @@ def download_music_mp3(token: str):
     client = Redis(connection_pool=connection_pool)
     key = f"countdownbot-music-{token}"
     if not client.exists(key):
-        return 404, "Bad token"
+        # return 404, "Bad token"
+        flask.abort(404)
     # file_bytes=
     from io import BytesIO
     buf = BytesIO(client.get(key))
