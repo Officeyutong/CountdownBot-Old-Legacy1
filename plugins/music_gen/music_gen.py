@@ -141,6 +141,7 @@ def noteconvert(note_string: str, update_status: Callable[[str], None], finish_c
     except Exception as ex:
         # bot.send(context, f"发生错误: {ex}")
         update_status(f"发生错误: {ex}")
+        raise ex
 
 
 @command(name="convert-play", help="转换简谱并播放 | 使用genhelp指令查看帮助")
