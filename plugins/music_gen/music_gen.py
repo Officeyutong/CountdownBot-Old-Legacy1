@@ -2,12 +2,15 @@ from common.datatypes import PluginMeta
 from common.plugin import dataclass_wrapper
 
 from register import command
-from global_vars import CONFIG
+from global_vars import CONFIG, VARS
 from .pysynth_b import make_wav
 from pysynth_b import mix_files
 from cqhttp import CQHttp
 from typing import List, Tuple, Callable
 from pydub import AudioSegment
+from redis import Redis, ConnectionPool
+# from flask import Flask
+import flask
 import base64
 import threading
 import tempfile
@@ -23,6 +26,44 @@ plugin = dataclass_wrapper(lambda: PluginMeta(
     version=1.0,
     description="生成音乐"
 ))
+
+web_app: flask.Flask = VARS["web_app"]
+
+
+def load():
+    # 创建Redis连接池
+    global connection_pool
+    connection_pool = ConnectionPool.from_url(config.REDIS_URI)
+    print("Redis连接池已加载..")
+
+
+@web_app.route("/music/download/<string:token>")
+def download_music_mp3(token: str):
+    client = Redis(connection_pool=connection_pool)
+    key = f"countdownbot-music-{token}"
+    if not client.exists(key):
+        return 404, "Bad token"
+    # file_bytes=
+    from io import BytesIO
+    buf = BytesIO(client.get(key))
+    buf.seek(0)
+    # client.delete(key)
+    return flask.send_file(buf, as_attachment=True, attachment_filename=f"{token}.mp3", conditional=True)
+
+
+def store_into_redis(token: str, data: bytes):
+    client = Redis(connection_pool=connection_pool)
+    key = f"countdownbot-music-{token}"
+    my_keys = list(client.keys("countdownbot-music-*"))
+    # print(my_keys)
+    if len(my_keys) >= config.MAX_STORING_FILES:
+        print("Too many files stored...")
+        print(my_keys)
+        my_keys.sort(key=lambda x: client.pttl(x))
+        print(f"Dropping {my_keys[0]}")
+        client.delete(my_keys[0])
+    print(token, "stored")
+    client.set(key, data, px=config.DOWNLOAD_TIMEOUT)
 
 
 def load_from_ubntupastebin(url: str) -> str:
@@ -156,8 +197,7 @@ def convert_play(bot: CQHttp, context: dict, args: List[str]):
         item = item.strip()
         if item.startswith("from:"):
             url = item[item.index(":")+1:]
-            filtered = load_from_ubntupastebin(url).split()
-            break
+            filtered.extend(load_from_ubntupastebin(url).split())
         else:
             filtered.append(item)
     major = "C"
@@ -185,8 +225,9 @@ def noteconvert_command(bot: CQHttp, context: dict, args: List[str] = None):
         item = item.strip()
         if item.startswith("from:"):
             url = item[item.index(":")+1:]
-            noteconvert(load_from_ubntupastebin(url), callback, callback)
-            return
+            # noteconvert(, callback, callback)
+            # return
+            filtered.extend(load_from_ubntupastebin(url).split())
         else:
             filtered.append(item)
     noteconvert(" ".join(filtered), callback, callback)
@@ -243,6 +284,11 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
                 volume = [volume[0] for i in range(track_count)]
     else:
         volume = [config.DEFAULT_VOLUME for i in range(track_count)]
+    if "download" in string:
+        string = string.replace("download", "")
+        will_download = True
+    else:
+        will_download = False
     if len(volume) != track_count:
         updater("音量个数需要与音轨个数相等.")
         return
@@ -288,15 +334,28 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
         song = AudioSegment.from_wav(wav_output)
         song.export(mp3_output)
         with open(mp3_output, "rb") as f:
+            mp3_data = f.read()
             base64_data = "[CQ:record,file=base64://{}]".format(
-                base64.encodebytes(f.read()).decode(
+                base64.encodebytes(mp3_data).decode(
                     "utf-8").replace("\n", ""))
         os.remove(wav_output)
         os.remove(mp3_output)
+        # print(mp3_output)
+
         for file in track_files:
             if os.path.exists(file):
                 os.remove(file)
+        if will_download:
+            import uuid
+            import urllib.parse
+            token = str(uuid.uuid1())
+            store_into_redis(token, mp3_data)
+            download_url = urllib.parse.urljoin(
+                config.WEB_URL, f"/music/download/{token}")
+            updater(
+                f"请前往 {download_url} 下载您的文件,此链接将在 {config.DOWNLOAD_TIMEOUT} 毫秒后失效.")
         callback(base64_data)
+
     threading.Thread(target=process).start()
 
 
@@ -308,8 +367,9 @@ def generate_music_command(bot: CQHttp, context: dict, args: List[str] = None):
         item = item.strip()
         if item.startswith("from:"):
             url = item[item.index(":")+1:]
-            generate_music(load_from_ubntupastebin(url), callback, callback)
-            return
+            # generate_music(, callback, callback)
+            # return
+            filtered.extend(load_from_ubntupastebin(url).split())
         else:
             filtered.append(item)
     generate_music(" ".join(filtered), callback, callback)
@@ -361,13 +421,18 @@ def genhelp(bot: CQHttp, context: dict, *args):
     使用此方式时,除了from:参数外,其他参数均会被忽略
 
     特殊参数:
-    inverse 与 beats
+    
+    inverse 与 beats:
     当乐谱中出现inverse参数时,节拍x表示的意义将会变成"这个音占y分音符的比例",其中y通过另一个参数beats指定,默认为4
     例如以下调用
     convert-play major:F bpm:120 inverse beats:3 1.1 2.1 3.1
     将会生成三个三分音符
+    
     volume:
     此参数用于指定多个音轨的音量,有以下两种使用方式
     volume:x --- 指定所有音轨的音量均为x,默认为{config.DEFAULT_VOLUME}
     volume:a,b,c... --- 依次指定各个音轨的音量,音量个数需要与音轨个数相等
+    
+    download:
+    添加此参数将会允许用户下载所生成的音乐文件
     """)

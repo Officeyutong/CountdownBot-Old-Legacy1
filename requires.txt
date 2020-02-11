@@ -18,3 +18,4 @@ echarts-china-provinces-pypkg
 pillow
 pydub
 sox
+redis
