@@ -107,8 +107,12 @@ def transform_notes(notes: List[str], major: str):
 
         if "r" not in note:
             if note.strip():
-                result.append(transform_single_note(
-                    note.strip(), major_height))
+                try:
+                    result.append(transform_single_note(
+                        note.strip(), major_height))
+                except Exception as ex:
+                    print(f"Bad note: {note}")
+                    raise
         else:
             result.append(note)
     return result
