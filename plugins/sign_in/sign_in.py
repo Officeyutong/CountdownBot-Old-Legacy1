@@ -38,8 +38,6 @@ def load():
     import threading
     threading.Thread(target=fetch_ip).start()
 
-    
-
 
 @web_app.route("/signin/rank", methods=["POST", "GET"])
 @web_app.route("/signin/rank/<int:group_id>", methods=["POST", "GET"])
@@ -50,9 +48,12 @@ def view_signin(group_id=None):
 @command(name="签到", help="签到")
 def sign_in(bot, context, args):
 
+    if global_vars.config.SERVER_URL:
+        url = global_vars.config.SERVER_URL
+    else:
+        url = f"http://{public_ip}"
 
-    tail_string = "请前往 http://{}:{}/signin/rank/{} 查看签到排名".format(
-        public_ip, global_vars.config.POST_PORT, context["group_id"])
+    tail_string = f"请前往 {url}:{global_vars.config.POST_PORT}/signin/rank/{context["group_id"]} 查看签到排名"
     bot.send(context, get_reply(context)+"\n"+tail_string)
 
 

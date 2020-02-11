@@ -20,3 +20,5 @@ COMMAND_PREFIX = ["--", "!!"]
 COMMAND_COOLDOWN = 0
 # 调试模式
 DEBUG = False
+# 服务器URL
+SERVER_URL = "http://ecs.zhehao.top"

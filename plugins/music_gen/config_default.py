@@ -12,5 +12,3 @@ DOWNLOAD_TIMEOUT = 3*1000*60
 
 # 所存储的最多的文件数
 MAX_STORING_FILES = 10
-# URL根
-WEB_URL = "http://127.0.0.1:5002"
