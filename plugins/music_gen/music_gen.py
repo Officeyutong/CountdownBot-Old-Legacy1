@@ -345,6 +345,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
         for file in track_files:
             if os.path.exists(file):
                 os.remove(file)
+        callback(base64_data)
         if will_download:
             import uuid
             import urllib.parse
@@ -354,7 +355,7 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
                 config.WEB_URL, f"/music/download/{token}")
             updater(
                 f"请前往 {download_url} 下载您的文件,此链接将在 {config.DOWNLOAD_TIMEOUT} 毫秒后失效.")
-        callback(base64_data)
+        
 
     threading.Thread(target=process).start()
 
