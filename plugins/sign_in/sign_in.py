@@ -53,7 +53,7 @@ def sign_in(bot, context, args):
     else:
         url = f"http://{public_ip}"
 
-    tail_string = f"请前往 {url}:{global_vars.config.POST_PORT}/signin/rank/{context["group_id"]} 查看签到排名"
+    tail_string = f"请前往 {url}:{global_vars.config.POST_PORT}/signin/rank/{context['group_id']} 查看签到排名"
     bot.send(context, get_reply(context)+"\n"+tail_string)
 
 
