@@ -17,7 +17,7 @@ def shit(bot: CQHttp, contect: dict = None, args: List[str] = None):
     string = " ".join(args[1:])[:500]
     items = list(jieba.cut_for_search(string))
     random.shuffle(items)
-    bot.send("".join(items))
+    bot.send(context, "".join(items))
 
 
 @command(name="bullshit", help="狗屁不通文章生成器 | bullshit [主题]")
