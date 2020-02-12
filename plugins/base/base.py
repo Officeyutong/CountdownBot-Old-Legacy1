@@ -20,7 +20,7 @@ def plugin():
 @command(name="help", help="查看帮助")
 def help(bot: CQHttp, context=None, args=None):
     bot.send(context, "".join(
-        map(lambda x: x[0]+" --- "+x[1][0]+"\n", commands.items())))
+        map(lambda x: x[0]+" --- "+x[1][0]+"\n", sorted(commands.items(), key=lambda x: x[0]))))
 
 
 @command(name="status", help="查看Bot运行状态")
