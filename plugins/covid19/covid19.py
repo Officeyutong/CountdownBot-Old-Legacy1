@@ -55,7 +55,7 @@ def make_province_image(data: Dict[str, Union[Dict, int, str]], update_time) -> 
     return image_data
 
 
-@command(name="ncov", help="查询2019nCov疫情 | ncov (省名)")
+@command(name="covid19", help="查询COVID-19（原2019-nCov）疫情 | covid19 (省名)")
 def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
     import bs4
     import requests
@@ -129,7 +129,7 @@ def dxy_query(bot: CQHttp, context=None, args: List[str] = None):
         bot.send(context, "请输入正确的省份名称")
 
 
-@command(name="ncovnews", help="查询2019nCov最近5条实时播报")
+@command(name="covnews", help="查询COVID-19（原2019-nCov）最近5条实时播报")
 def ncov_news(bot: CQHttp, context=None, args: List[str] = None):
     import bs4
     import requests

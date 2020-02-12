@@ -10,6 +10,7 @@ from typing import List, Tuple, Callable
 from pydub import AudioSegment
 from redis import Redis, ConnectionPool
 # from flask import Flask
+import global_vars
 import flask
 import base64
 import threading
@@ -353,10 +354,9 @@ def generate_music(note_string: str, updater: Callable[[str], None], callback: C
             token = str(uuid.uuid1())
             store_into_redis(token, mp3_data)
             download_url = urllib.parse.urljoin(
-                config.WEB_URL, f"/music/download/{token}")
+                f"{global_vars.config.SERVER_URL}:{global_vars.config.POST_PORT}", f"/music/download/{token}")
             updater(
                 f"请前往 {download_url} 下载您的文件,此链接将在 {config.DOWNLOAD_TIMEOUT} 毫秒后失效.")
-        
 
     threading.Thread(target=process).start()
 
