@@ -13,7 +13,7 @@ plugin = dataclass_wrapper(lambda: PluginMeta(
 
 
 @command(name="shit", help="将输入字符串分词后随机打乱")
-def shit(bot: CQHttp, contect: dict = None, args: List[str] = None):
+def shit(bot: CQHttp, context: dict = None, args: List[str] = None):
     string = " ".join(args[1:])[:500]
     items = list(jieba.cut_for_search(string))
     random.shuffle(items)
