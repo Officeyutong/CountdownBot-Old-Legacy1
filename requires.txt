@@ -19,3 +19,4 @@ pillow
 pydub
 sox
 redis
+jieba

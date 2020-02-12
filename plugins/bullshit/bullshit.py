@@ -3,11 +3,21 @@ from common.plugin import dataclass_wrapper
 from register import command
 from cqhttp import CQHttp
 from typing import List
+import jieba
+import random
 plugin = dataclass_wrapper(lambda: PluginMeta(
     author="officeyutong",
     version=1.0,
     description="狗屁不通文章生成器"
 ))
+
+
+@command(name="shit", help="将输入字符串分词后随机打乱")
+def shit(bot: CQHttp, contect: dict = None, args: List[str] = None):
+    string = " ".join(args[1:])[:500]
+    items = list(jieba.cut_for_search(string))
+    random.shuffle(items)
+    bot.send("".join(items))
 
 
 @command(name="bullshit", help="狗屁不通文章生成器 | bullshit [主题]")
