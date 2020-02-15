@@ -12,3 +12,9 @@ def dataclass_wrapper(func):
             "description": result.description
         }
     return inner
+
+
+class Plugin:
+    def __init__(self):
+        pass
+    # def register_event(self,)

@@ -51,6 +51,43 @@ def plugin():
     }
 
 
+@command(name="solve", help="解方程组 | solve 未知数1,未知数2... 方程1,方程2... (未知数和方程中不得含有空格)")
+def solve(bot: CQHttp, context: dict, args: List[str] = None):
+    def process():
+        try:
+            unknown, equations, *_ = args[1:]
+        except Exception as ex:
+            bot.send(context, "请输入正确的参数格式")
+            raise ex
+            # return
+
+        def solve():
+            print_log("Starting...")
+            try:
+                # res = sympy.integrate(func, x)
+                result = sympy.solve(equations.split(","), unknown.split(","))
+                buffer: BytesIO = renderLatex(
+                    "$${}$$".format(sympy.latex(result)))
+                bot.send(context, "Python表达式:\n{}\n\nLatex:\n{}\n\n图像:\n[CQ:image,file=base64://{}]".format(
+                    result, sympy.latex(result), base64.encodebytes(buffer.getvalue()).decode(
+                        "utf-8").replace("\n", "")))
+            except Exception as ex:
+                bot.send(context, ("{}".format(ex))[:300])
+                raise ex
+            print_log("Done...")
+        thd2 = threading.Thread(target=solve)
+        thd2.start()
+        begin = time.time()
+        while time.time()-begin < 10:
+            time.sleep(0.1)
+        if thd2.is_alive():
+            bot.send(context, f"解方程{unknown},{equations}运行超时.")
+            util.stop_thread(thd2)
+
+    thread = threading.Thread(target=process)
+    thread.start()
+
+
 @command(name="integrate", help="对f(x)进行不定积分")
 def integrate(bot: CQHttp, context=None, args=None):
 
