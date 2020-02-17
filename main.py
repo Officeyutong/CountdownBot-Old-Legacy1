@@ -52,7 +52,12 @@ def start():
             continue
         if plugin.startswith("__"):
             continue
-        load_plugin(plugin)
+        try:
+            load_plugin(plugin)
+        except Exception as ex:
+            import traceback
+            traceback.print_exc()
+
     print_log("Registered commands:\n{}".format("".join(
         map(lambda x: "{} :{}\n".format(x[0], x[1]), registered_commands.items()))))
     print_log("Registered message listeners:\n{}".format(message_listeners))

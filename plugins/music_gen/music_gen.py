@@ -376,6 +376,7 @@ def generate_music_command(bot: CQHttp, context: dict, args: List[str] = None):
             filtered.append(item)
     generate_music(" ".join(filtered), callback, callback)
 
+# @command(name="merge-music",help="合并音频文件 ")
 
 @command(name="genhelp", help="查看音乐生成器帮助")
 def genhelp(bot: CQHttp, context: dict, *args):
