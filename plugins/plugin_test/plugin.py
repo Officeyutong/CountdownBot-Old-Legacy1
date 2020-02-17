@@ -1,5 +1,6 @@
 from common.plugin import Plugin
 from common.datatypes import PluginMeta
+from common.config_loader import ConfigBase
 
 
 class MyPlugin(Plugin):
@@ -9,5 +10,13 @@ class MyPlugin(Plugin):
         )
 
 
+class MyPluginConfig(ConfigBase):
+    TEST_URL: str = ""
+    
+
 def get_plugin_class():
     return MyPlugin
+
+
+def get_config_class():
+    return MyPluginConfig

@@ -8,7 +8,7 @@ import util
 # import json
 # import urllib
 import requests
-
+from typing import List
 client = requests.session()
 
 
@@ -21,7 +21,7 @@ def plugin():
 
 
 @command(name="oier", help="执行oierdb查询(http://bytew.net/OIer)")
-def oier_query(bot: CQHttp, context=None, args: list = None):
+def oier_query(bot: CQHttp, context: dict = None, args: List[str] = None):
     print_log("querying "+str(args))
     while args and not args[-1].strip():
         args.pop()

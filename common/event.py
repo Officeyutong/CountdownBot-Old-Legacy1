@@ -14,13 +14,6 @@ class MessageEvent(EventBase):
         self.context = context
 
 
-class CommandEvent(EventBase):
-    def __init__(self, command_name: str, args: List[str], raw_string: str, context: dict):
-        super.__init__(self)
-        self.command_name = command_name
-        self.args = args
-        self.raw_string = raw_string
-        self.context = context
 
 
 EventCallback = Callable[[EventBase], None]
