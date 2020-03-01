@@ -1,3 +1,6 @@
+
+**本项目为CountdownBot旧架构的存档，已经作为，新项目请见[](https://gitee.com/yutong_java/Countdown-Bot)**
+
 # Countdown-Bot
 
 #### 项目介绍
